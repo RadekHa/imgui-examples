@@ -3,9 +3,9 @@ include(FetchContent)
 # Dependencies
 
 FetchContent_Declare(
-  doctest
-  GIT_REPOSITORY "https://github.com/onqtam/doctest.git"
-  GIT_TAG v2.4.11
+  Catch2
+  GIT_REPOSITORY "https://github.com/catchorg/Catch2.git"
+  GIT_TAG "v3.11.0"
 )
 
 FetchContent_Declare(
@@ -37,7 +37,6 @@ FetchContent_Declare(
 # For SDL2 to be able to override options
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-set(DOCTEST_NO_INSTALL ON)
 set(FMT_INSTALL OFF)
 set(SDL2_DISABLE_SDL2MAIN ON)
 set(SPDLOG_FMT_EXTERNAL ON)
@@ -46,4 +45,4 @@ add_subdirectory(imgui-setup)
 
 # Populate
 
-FetchContent_MakeAvailable(doctest fmt imgui SDL2 spdlog)
+FetchContent_MakeAvailable(Catch2 fmt imgui SDL2 spdlog)

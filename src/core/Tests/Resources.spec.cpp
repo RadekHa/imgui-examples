@@ -1,13 +1,10 @@
-#include <doctest/doctest.h>
+#include <catch2/catch_test_macros.hpp>
 #include <string>
 
-// NOLINTBEGIN(misc-use-anonymous-namespace, cppcoreguidelines-avoid-do-while, cert-err33-c)
+using namespace std;
 
-TEST_SUITE("Core::Resources") {
-  TEST_CASE("Example") {
-    const std::string input{"A"};
-    CHECK_EQ(input, "A");
-  }
+TEST_CASE("Core::Resources") {
+  const string input{"A"};
+  REQUIRE(input == "A");
 }
 
-// NOLINTEND(misc-use-anonymous-namespace, cppcoreguidelines-avoid-do-while, cert-err33-c)
