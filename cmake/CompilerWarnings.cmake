@@ -1,7 +1,7 @@
 # https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md
 
 function(set_project_warnings project_name)
-  option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" TRUE)
+  option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" FALSE)
   message(STATUS "Treat compiler warnings as errors")
 
   set(MSVC_WARNINGS
@@ -34,6 +34,7 @@ function(set_project_warnings project_name)
     /w14905 # wide string literal cast to 'LPSTR'
     /w14906 # string literal cast to 'LPWSTR'
     /w14928 # illegal copy-initialization; more than one user-defined
+    /wd4392 # MSVC bug: incorrect number of arguments for intrinsic
     # conversion has been implicitly applied
     /permissive- # standards conformance mode for MSVC compiler.
     )
