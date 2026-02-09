@@ -1,37 +1,41 @@
 #include "Core/DPIHandler.hpp"
-
-#include <SDL2/SDL.h>
-#include <imgui.h>
-
-#include "Core/Debug/Instrumentor.hpp"
 #include "Core/Window.hpp"
 
-namespace App {
+#include <imgui.h>
+#include <SDL2/SDL.h>
+#include <tracy/Tracy.hpp>
 
-float DPIHandler::get_scale() {
-  APP_PROFILE_FUNCTION();
 
-  constexpr int display_index{0};
-  const float default_dpi{96.0F};
-  float dpi{default_dpi};
+namespace App
+{
+    float DPIHandler::get_scale ()
+    {
+        ZoneScoped;
 
-  SDL_GetDisplayDPI(display_index, nullptr, &dpi, nullptr);
+        constexpr int display_index{0};
+        const float default_dpi{96.0F};
+        float dpi{default_dpi};
 
-  return dpi / default_dpi;
-}
+        SDL_GetDisplayDPI (display_index, nullptr, &dpi, nullptr);
 
-WindowSize DPIHandler::get_dpi_aware_window_size(const Window::Settings& settings) {
-  APP_PROFILE_FUNCTION();
+        return dpi / default_dpi;
+    }
 
-  const float scale{DPIHandler::get_scale()};
-  const int width{static_cast<int>(static_cast<float>(settings.width) * scale)};
-  const int height{static_cast<int>(static_cast<float>(settings.height) * scale)};
-  return {width, height};
-}
+    WindowSize DPIHandler::get_dpi_aware_window_size (const Window::Settings& settings)
+    {
+        ZoneScoped;
 
-void DPIHandler::set_global_font_scaling([[maybe_unused]] ImGuiIO* io) {
-  APP_PROFILE_FUNCTION();
-  // do nothing
-}
+        const float scale{DPIHandler::get_scale ()};
+        const int width{static_cast<int> (static_cast<float> (settings.width) * scale)};
+        const int height{static_cast<int> (static_cast<float> (settings.height) * scale)};
+        return {
+                   width, height
+        };
+    }
 
+    void DPIHandler::set_global_font_scaling ( [ [maybe_unused]] ImGuiIO* io)
+    {
+        ZoneScoped;
+        // do nothing
+    }
 }  // namespace App

@@ -17,7 +17,7 @@ FetchContent_Declare(
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY "https://github.com/ocornut/imgui.git"
-  GIT_TAG 368123ab06b2b573d585e52f84cd782c5c006697 # Branch: docking, date: 07.11.2024, 07:58 GMT+1
+  GIT_TAG docking
 )
 
 FetchContent_Declare(
@@ -30,6 +30,13 @@ FetchContent_Declare(
   spdlog
   GIT_REPOSITORY "https://github.com/gabime/spdlog.git"
   GIT_TAG v1.15.0
+)
+
+FetchContent_Declare(
+  tracy
+  GIT_REPOSITORY "https://github.com/wolfpld/tracy.git"
+  GIT_TAG master
+#  GIT_TAG v0.13.2
 )
 
 # Settings
@@ -45,4 +52,4 @@ add_subdirectory(imgui-setup)
 
 # Populate
 
-FetchContent_MakeAvailable(Catch2 fmt imgui SDL2 spdlog)
+FetchContent_MakeAvailable(Catch2 fmt imgui SDL2 spdlog tracy)

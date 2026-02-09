@@ -1,58 +1,61 @@
+#include "Core/DPIHandler.hpp"
+#include "Core/Log.hpp"
 #include "Window.hpp"
 
 #include <SDL2/SDL.h>
+#include <tracy/Tracy.hpp>
 
-#include "Core/DPIHandler.hpp"
-#include "Core/Debug/Instrumentor.hpp"
-#include "Core/Log.hpp"
+namespace App
+{
+    Window::Window (const Settings& settings)
+    {
+        ZoneScoped;
 
-namespace App {
+        const auto window_flags{
+            static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI)
+        };
+        const WindowSize size{DPIHandler::get_dpi_aware_window_size (settings)};
 
-Window::Window(const Settings& settings) {
-  APP_PROFILE_FUNCTION();
+        m_window = SDL_CreateWindow (settings.title.c_str (),
+                                     SDL_WINDOWPOS_CENTERED,
+                                     SDL_WINDOWPOS_CENTERED,
+                                     size.width,
+                                     size.height,
+                                     window_flags);
 
-  const auto window_flags{
-      static_cast<SDL_WindowFlags>(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI)};
-  const WindowSize size{DPIHandler::get_dpi_aware_window_size(settings)};
+        Uint32 renderer_flags{SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED};
+        m_renderer = SDL_CreateRenderer (m_window, -1, renderer_flags);
 
-  m_window = SDL_CreateWindow(settings.title.c_str(),
-      SDL_WINDOWPOS_CENTERED,
-      SDL_WINDOWPOS_CENTERED,
-      size.width,
-      size.height,
-      window_flags);
+        if (m_renderer == nullptr)
+        {
+            APP_ERROR ("Error creating SDL_Renderer!");
+            return;
+        }
+        SDL_RendererInfo info;
+        SDL_GetRendererInfo (m_renderer, &info);
 
-  Uint32 renderer_flags{SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED};
-  m_renderer = SDL_CreateRenderer(m_window, -1, renderer_flags);
+        APP_DEBUG ("Current SDL_Renderer: {}", info.name);
+    }
 
-  if (m_renderer == nullptr) {
-    APP_ERROR("Error creating SDL_Renderer!");
-    return;
-  }
+    Window::~Window ()
+    {
+        ZoneScoped;
 
-  SDL_RendererInfo info;
-  SDL_GetRendererInfo(m_renderer, &info);
+        SDL_DestroyRenderer (m_renderer);
+        SDL_DestroyWindow (m_window);
+    }
 
-  APP_DEBUG("Current SDL_Renderer: {}", info.name);
+    SDL_Window* Window::get_native_window () const
+    {
+        ZoneScoped;
+
+        return m_window;
+    }
+
+    SDL_Renderer* Window::get_native_renderer () const
+    {
+        ZoneScoped;
+
+        return m_renderer;
+    }
 }
-
-Window::~Window() {
-  APP_PROFILE_FUNCTION();
-
-  SDL_DestroyRenderer(m_renderer);
-  SDL_DestroyWindow(m_window);
-}
-
-SDL_Window* Window::get_native_window() const {
-  APP_PROFILE_FUNCTION();
-
-  return m_window;
-}
-
-SDL_Renderer* Window::get_native_renderer() const {
-  APP_PROFILE_FUNCTION();
-
-  return m_renderer;
-}
-
-}  // namespace App
