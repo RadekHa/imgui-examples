@@ -1,24 +1,35 @@
 #define SDL_MAIN_HANDLED
 
-#include <exception>
-
 #include "Core/Application.hpp"
 #include "Core/Log.hpp"
 #include "tracy/Tracy.hpp"
 
+#include <exception>
+
+using namespace App;
+
 int main ()
 {
+    ZoneScoped;
+
+    ExitStatus status{ExitStatus::SUCCESS};
+
     try
     {
-        ZoneScoped;
+        Application app{"App"};
 
-        App::Application app{"App"};
-        app.run ();
+        status = app.run ();
     }
     catch (std::exception& e)
     {
         APP_ERROR ("Main process terminated with: {}", e.what ());
+        status = ExitStatus::FAILURE;
+    }
+    catch (...)
+    {
+        APP_ERROR ("Fatal unknown error.");
+        status = ExitStatus::FAILURE;
     }
 
-    return 0;
+    return static_cast<int> (status);
 }
