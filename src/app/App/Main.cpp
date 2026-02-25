@@ -7,6 +7,7 @@
 #include <exception>
 
 using namespace App;
+using namespace std;
 
 int main ()
 {
@@ -20,7 +21,7 @@ int main ()
 
         status = app.run ();
     }
-    catch (std::exception& e)
+    catch (exception& e)
     {
         APP_ERROR ("Main process terminated with: {}", e.what ());
         status = ExitStatus::FAILURE;
