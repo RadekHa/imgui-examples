@@ -1,44 +1,63 @@
 #pragma once
+#include "Core/Window.hpp"
 
 #include <SDL2/SDL.h>
 
 #include <memory>
 #include <string>
-#include <vector>
 
-#include "Core/Window.hpp"
+namespace App
+{
+    /** Enum representing the exit status of the application. */
+    enum class ExitStatus : int
+    {
+        SUCCESS = 0,
+        FAILURE = 1
+    };
 
-namespace App {
+    /** Main application class. */
+    class Application
+    {
+    public:
+        /** Initializes the application with a given title. */
+        explicit Application (const std::string& title);
+        /* Cleaning up resources. */
+        ~Application ();
 
-enum class ExitStatus : int { SUCCESS = 0, FAILURE = 1 };
+        /** The copy constructor is deleted. */
+        Application (const Application&) = delete;
+        /** The move constructor is deleted. */
+        Application (Application&&) = delete;
+        /** The copy assignment operator is deleted. */
+        Application& operator= (Application) = delete;
+        /** The move assignment operator is deleted. */
+        Application& operator= (Application&&) = delete;
 
-class Application {
- public:
-  explicit Application(const std::string& title);
-  ~Application();
+        /** Runs the main application loop and returns the exit status. */
+        ExitStatus run ();
 
-  Application(const Application&) = delete;
-  Application(Application&&) = delete;
-  Application& operator=(Application other) = delete;
-  Application& operator=(Application&& other) = delete;
+        /** Stops the application. */
+        void stop ();
 
-  ExitStatus run();
-  void stop();
+        /** Handle SDL events. */
+        void onEvent (const SDL_WindowEvent& event);
+        /** Handle window minimize event. */
+        void onMinimize ();
+        /** Handle window restore event. */
+        void onShown ();
+        /** Handle window close event. */
+        void onClose ();
 
-  void on_event(const SDL_WindowEvent& event);
-  void on_minimize();
-  void on_shown();
-  void on_close();
+    private:
+        /** Exit status of the application. */
+        ExitStatus m_exitStatus;
+        /** Unique pointer to the application window. */
+        std::unique_ptr<Window> m_window{nullptr};
 
- private:
-  ExitStatus m_exit_status{ExitStatus::SUCCESS};
-  std::unique_ptr<Window> m_window{nullptr};
-
-  bool m_running{true};
-  bool m_minimized{false};
-  bool m_show_some_panel{true};
-  bool m_show_debug_panel{false};
-  bool m_show_demo_panel{false};
-};
-
-}  // namespace App
+        bool m_running;
+        bool m_minimized;
+        bool m_show_some_panel;
+        bool m_show_debug_panel;
+        bool m_show_demo_panel;
+    };
+}
