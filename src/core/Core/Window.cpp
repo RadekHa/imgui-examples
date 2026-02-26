@@ -9,12 +9,15 @@ using namespace App;
 
 
 Window::Window (const Settings& settings)
+    : m_window {}
+    , m_renderer {}
 {
     ZoneScoped;
 
     const auto window_flags{
         static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI)
     };
+
     const WindowSize size{DPIHandler::get_dpi_aware_window_size (settings)};
 
     m_window = SDL_CreateWindow (settings.title.c_str (),
@@ -46,16 +49,14 @@ Window::~Window ()
     SDL_DestroyWindow (m_window);
 }
 
-SDL_Window* Window::get_native_window () const
+SDL_Window* Window::getNativeWindow () const
 {
     ZoneScoped;
-
     return m_window;
 }
 
-SDL_Renderer* Window::get_native_renderer () const
+SDL_Renderer* Window::getNativeRenderer () const
 {
     ZoneScoped;
-
     return m_renderer;
 }
