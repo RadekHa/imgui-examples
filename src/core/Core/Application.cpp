@@ -17,6 +17,12 @@ using namespace std;
 
 
 Application::Application (const string& title)
+    : m_exitStatus {ExitStatus::SUCCESS}
+    , m_running {true}
+    , m_minimized {}
+    , m_show_some_panel {true}
+    , m_show_debug_panel {}
+    , m_show_demo_panel {}
 {
     ZoneScoped;
 
@@ -25,7 +31,7 @@ Application::Application (const string& title)
     if (SDL_Init (init_flags) != 0)
     {
         APP_ERROR ("Error: %s\n", SDL_GetError ());
-        m_exit_status = ExitStatus::FAILURE;
+        m_exitStatus = ExitStatus::FAILURE;
     }
     m_window = make_unique<Window> (Window::Settings{title});
 }
@@ -45,9 +51,9 @@ ExitStatus Application::run ()
 {
     ZoneScoped;
 
-    if (m_exit_status == ExitStatus::FAILURE)
+    if (m_exitStatus == ExitStatus::FAILURE)
     {
-        return m_exit_status;
+        return m_exitStatus;
     }
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION ();
@@ -74,8 +80,8 @@ ExitStatus Application::run ()
     DPIHandler::set_global_font_scaling (&io);
 
     // Setup Platform/Renderer backends
-    ImGui_ImplSDL2_InitForSDLRenderer (m_window->get_native_window (), m_window->get_native_renderer ());
-    ImGui_ImplSDLRenderer2_Init (m_window->get_native_renderer ());
+    ImGui_ImplSDL2_InitForSDLRenderer (m_window->getNativeWindow (), m_window->getNativeRenderer ());
+    ImGui_ImplSDLRenderer2_Init (m_window->getNativeRenderer ());
 
     m_running = true;
 
@@ -97,9 +103,9 @@ ExitStatus Application::run ()
             }
 
             if ((event.type == SDL_WINDOWEVENT) &&
-                (event.window.windowID == SDL_GetWindowID (m_window->get_native_window ())))
+                (event.window.windowID == SDL_GetWindowID (m_window->getNativeWindow ())))
             {
-                on_event (event.window);
+                onEvent (event.window);
             }
         }
         // Start the Dear ImGui frame
@@ -210,62 +216,60 @@ ExitStatus Application::run ()
         // Rendering
         ImGui::Render ();
 
-        SDL_RenderSetScale (m_window->get_native_renderer (),
+        SDL_RenderSetScale (m_window->getNativeRenderer (),
                             io.DisplayFramebufferScale.x,
                             io.DisplayFramebufferScale.y);
-        SDL_SetRenderDrawColor (m_window->get_native_renderer (), 100, 100, 100, 255);
-        SDL_RenderClear (m_window->get_native_renderer ());
-        ImGui_ImplSDLRenderer2_RenderDrawData (ImGui::GetDrawData (), m_window->get_native_renderer ());
-        SDL_RenderPresent (m_window->get_native_renderer ());
+        SDL_SetRenderDrawColor (m_window->getNativeRenderer (), 100, 100, 100, 255);
+        SDL_RenderClear (m_window->getNativeRenderer ());
+        ImGui_ImplSDLRenderer2_RenderDrawData (ImGui::GetDrawData (), m_window->getNativeRenderer ());
+        SDL_RenderPresent (m_window->getNativeRenderer ());
     }
-    return m_exit_status;
+    return m_exitStatus;
 }
 
 void Application::stop ()
 {
     ZoneScoped;
-
     m_running = false;
 }
 
-void Application::on_event (const SDL_WindowEvent& event)
+void Application::onEvent (const SDL_WindowEvent& event)
 {
     ZoneScoped;
 
     switch (event.event)
     {
     case SDL_WINDOWEVENT_CLOSE:
-        return on_close ();
+        onClose ();
+        break;
 
     case SDL_WINDOWEVENT_MINIMIZED:
-        return on_minimize ();
+        onMinimize ();
+        break;
 
     case SDL_WINDOWEVENT_SHOWN:
-        return on_shown ();
+        onShown ();
+        break;
 
     default:
-        // Do nothing otherwise
-        return;
+        break;
     }
 }
 
-void Application::on_minimize ()
+void Application::onMinimize ()
 {
     ZoneScoped;
-
     m_minimized = true;
 }
 
-void Application::on_shown ()
+void Application::onShown ()
 {
     ZoneScoped;
-
     m_minimized = false;
 }
 
-void Application::on_close ()
+void Application::onClose ()
 {
     ZoneScoped;
-
     stop ();
 }
