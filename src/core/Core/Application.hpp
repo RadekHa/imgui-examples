@@ -1,7 +1,9 @@
 #pragma once
-#include "Core/Window.hpp"
-
-#include <SDL2/SDL.h>
+#include "AppUi.h"
+#include "DataModel.h"
+#include "ImGuiPass.h"
+#include "Renderer.h"
+#include "Window.hpp"
 
 #include <memory>
 #include <string>
@@ -39,25 +41,18 @@ namespace App
         /** Stops the application. */
         void stop ();
 
-        /** Handle SDL events. */
-        void onEvent (const SDL_WindowEvent& event);
-        /** Handle window minimize event. */
-        void onMinimize ();
-        /** Handle window restore event. */
-        void onShown ();
-        /** Handle window close event. */
-        void onClose ();
-
     private:
         /** Exit status of the application. */
         ExitStatus m_exitStatus;
-        /** Unique pointer to the application window. */
-        std::unique_ptr<Window> m_window{nullptr};
+        /* Flag indicating whether the main application loop is running. */
+        bool m_isRunning;
 
-        bool m_running;
-        bool m_minimized;
-        bool m_show_some_panel;
-        bool m_show_debug_panel;
-        bool m_show_demo_panel;
+        EventBus m_bus;
+
+        Window m_window;
+        Renderer m_renderer;
+        ImGuiPass m_imgui;
+        DataModel m_model;
+        AppUi m_ui;
     };
 }

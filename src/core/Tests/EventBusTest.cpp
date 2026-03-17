@@ -5,35 +5,50 @@
 using namespace App;
 using namespace std;
 
+
 TEST_CASE ("Core::EventBus")
 {
-    using MyEventBus = EventBus<variant<int, string> >;
+    using Events = variant<int, string>;
+    using EventBus = EventBusImpl<Events>;
 
-    MyEventBus bus;
+    EventBus bus;
+
+    EventBus::Subscription subInt;
 
     int intCount = 0;
     int stringCount = 0;
 
-    {
-        auto subInt = bus.subscribe<int> ( [&] (int) {
-            ++intCount;
-        });
+    subInt = bus.subscribe<int> ( [&] (int) {
+        ++intCount;
+    });
 
+
+    {
         auto subString = bus.subscribe<string> ( [&] (const string&) {
             ++stringCount;
         });
 
+
         bus.publish (42);
         bus.publish (string ("Hello"));
 
+        bus.dispatch ();
+
         REQUIRE (intCount == 1);
         REQUIRE (stringCount == 1);
+
+        bus.publish (42);
+        bus.dispatch ();
+        REQUIRE (intCount == 2);
     }
 
+    subInt.unsubscribe ();
     // After the subscriptions go out of scope, they should be automatically unsubscribed.
     bus.publish (42);
     bus.publish (string ("Hello"));
 
-    REQUIRE (intCount == 1);
+    bus.dispatch ();
+
+    REQUIRE (intCount == 2);
     REQUIRE (stringCount == 1);
 }

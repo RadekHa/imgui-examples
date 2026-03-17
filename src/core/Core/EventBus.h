@@ -1,70 +1,57 @@
 #pragma once
-#include <algorithm>
-#include <memory>
+#include <functional>
+#include <queue>
 #include <tuple>
-#include <typeindex>
 #include <variant>
 #include <vector>
 
 namespace App
 {
-    // A simple type-safe event bus that allows subscribing to and publishing events of different types.
     template<typename Variant>
-    class EventBus;
+    class EventBusImpl;
 
-    // Specialization for std::variant. The event bus will support all event types listed in the variant.
     template<typename... Events>
-    class EventBus<std::variant<Events...> >
+    class EventBusImpl<std::variant<Events...> >
     {
     public:
+
         using VariantType = std::variant<Events...>;
-        using SubscriptionId = std::size_t;
+        using SubscriptionId = size_t;
 
     private:
 
-        template<typename TEvent>
-        struct HandlerEntry
+        template<typename T>
+        struct Handler
         {
             SubscriptionId id;
-            void* object;
-            void (* invoke)(void*, const TEvent&);
-            void (* destroy)(void*);
+            std::function<void (const T&)> fn;
         };
 
-        std::tuple<std::vector<HandlerEntry<Events> > ...> m_handlers;
+        template<typename T>
+        using HandlerList = std::vector<Handler<T> >;
+
+        std::tuple<HandlerList<Events> ...> m_handlers;
+
+        std::queue<VariantType> m_queue;
 
         SubscriptionId m_lastId = 0;
 
     public:
 
-        ~EventBus ()
-        {
-            ( [&] {
-                auto& vec = getVector<Events>();
-
-                for (auto& e : vec)
-                {
-                    e.destroy (e.object);
-                }
-            }
-              (), ...);
-        }
-
-        // Subscription object that automatically unsubscribes when it goes out of scope.
         class Subscription
         {
         public:
+
             Subscription () = default;
 
-            Subscription (EventBus* bus, std::type_index type, SubscriptionId id)
+            Subscription (EventBusImpl* bus, size_t typeIndex, SubscriptionId id)
                 : m_bus (bus)
-                , m_type (type)
+                , m_typeIndex (typeIndex)
                 , m_id (id)
             {
             }
 
             Subscription (const Subscription&) = delete;
-
             Subscription& operator= (const Subscription&) = delete;
 
             Subscription (Subscription&& other) noexcept
@@ -91,110 +78,159 @@ namespace App
             {
                 if (m_bus)
                 {
-                    m_bus->unsubscribeRaw (m_type, m_id);
+                    m_bus->unsubscribe (m_typeIndex, m_id);
                     m_bus = nullptr;
                 }
             }
 
         private:
+
             void moveFrom (Subscription&& other)
             {
                 m_bus = other.m_bus;
-                m_type = other.m_type;
+                m_typeIndex = other.m_typeIndex;
                 m_id = other.m_id;
 
                 other.m_bus = nullptr;
             }
 
-            EventBus* m_bus = nullptr;
-            std::type_index m_type{typeid (void)};
+            EventBusImpl* m_bus = nullptr;
+            size_t m_typeIndex = 0;
             SubscriptionId m_id = 0;
         };
 
-        // Subscribe with a lambda or any callable object.
-        // The callable will be stored on the heap, so it must be copyable or movable.
-        template<typename TEvent, typename F>
+    public:
+
+        template<typename Event, typename F>
         Subscription subscribe (F&& f)
         {
-            using Functor = std::decay_t<F>;
-            auto* heapObject = new Functor (std::forward<F> (f));
-            auto& vec = getVector<TEvent>();
+            auto& vec = getVector<Event>();
 
             SubscriptionId id = ++m_lastId;
 
-            vec.push_back ({
-                id,
-                heapObject,
-                [] (void* obj, const TEvent& event)
-                {
-                    (*static_cast<Functor*> (obj))(event);
-                },
-                [] (void* obj)
-                {
-                    delete static_cast<Functor*> (obj);
-                }
-            });
+            vec.push_back ({id, std::forward<F> (f)});
 
-            return Subscription (this, typeid (TEvent), id);
+            return Subscription (this, typeIndex<Event>(), id);
         }
 
-        // Subscribe with a member function pointer.
-        template<typename TEvent, typename TObject>
-        Subscription subscribe (TObject* instance, void (TObject::* method) (const TEvent &))
+        template<typename Event, typename Obj>
+        Subscription subscribe (Obj* object, void (Obj::* method) (const Event &))
         {
-            return subscribe<TEvent> ( [instance, method] (const TEvent& e) {
-                (instance->*method)(e);
-            });
-        }
-
-        // Publish an event to all subscribers of that event type.
-        template<typename TEvent>
-        void publish (const TEvent& event)
-        {
-            auto& vec = getVector<TEvent>();
-
-            for (size_t i = 0; i < vec.size (); ++i)
+            return subscribe<Event> (
+                [object, method] (const Event& e)
             {
-                auto entry = vec [i];
-                entry.invoke (entry.object, event);
+                (object->*method)(e);
             }
+                );
         }
 
-        // Publish an event from a variant. The correct handler will be called based on the actual type of the event.
-        void publishVariant (const VariantType& v)
+    public:
+
+        template<typename Event>
+        void publish (const Event& e)
         {
-            std::visit ( [this] (const auto& e) {
-                publish (e);
-            }, v);
+            m_queue.emplace (e);
+        }
+
+        void dispatch ()
+        {
+            while (!m_queue.empty ())
+            {
+                VariantType v = std::move (m_queue.front ());
+                m_queue.pop ();
+
+                std::visit ( [this] (auto&& e)
+                {
+                    dispatchSingle (e);
+                }, v);
+            }
         }
 
     private:
 
-        template<typename TEvent>
-        auto& getVector ()
+        template<typename Event>
+        void dispatchSingle (const Event& e)
         {
-            return std::get<std::vector<HandlerEntry<TEvent> > > (m_handlers);
-        }
+            auto& vec = getVector<Event>();
 
-        void unsubscribeRaw (std::type_index type, SubscriptionId id)
-        {
-            ((type == typeid (Events) ? removeFromVector<Events> (id) : void ()), ...);
-        }
-
-        template<typename TEvent>
-        void removeFromVector (SubscriptionId id)
-        {
-            auto& vec = getVector<TEvent>();
-
-            auto it = std::find_if (vec.begin (), vec.end (), [id] (const auto& e) {
-                return e.id == id;
-            });
-
-            if (it != vec.end ())
+            for (auto& h : vec)
             {
-                it->destroy (it->object);
-                vec.erase (it);
+                if (h.fn)
+                {
+                    h.fn (e);
+                }
             }
         }
+
+        template<typename Event>
+        auto& getVector ()
+        {
+            return std::get<HandlerList<Event> > (m_handlers);
+        }
+
+        template<typename Event>
+        constexpr size_t typeIndex ()
+        {
+            return variantIndex<Event, VariantType>();
+        }
+
+        void unsubscribe (size_t typeIndex, SubscriptionId id)
+        {
+            unsubscribeImpl (typeIndex, id, std::index_sequence_for<Events...> {});
+        }
+
+        template<size_t... I>
+        void unsubscribeImpl (size_t typeIndex, SubscriptionId id, std::index_sequence<I...> )
+        {
+            ((typeIndex == I ? removeFromVector<Events> (id) : void ()), ...);
+        }
+
+        template<typename Event>
+        void removeFromVector (SubscriptionId id)
+        {
+            auto& vec = getVector<Event>();
+
+            for (auto& h : vec)
+            {
+                if (h.id == id)
+                {
+                    h.fn = nullptr;
+                    break;
+                }
+            }
+        }
+
+    private:
+
+        template<typename T, typename Variant>
+        struct VariantIndex;
+
+        template<typename T, typename... Ts>
+        struct VariantIndex<T, std::variant<T, Ts...> >
+        {
+            static constexpr size_t value = 0;
+        };
+
+        template<typename T, typename U, typename... Ts>
+        struct VariantIndex<T, std::variant<U, Ts...> >
+        {
+            static constexpr size_t value = 1 + VariantIndex<T, std::variant<Ts...> >::value;
+        };
+
+        template<typename T, typename Variant>
+        static constexpr size_t variantIndex ()
+        {
+            return VariantIndex<T, Variant>::value;
+        }
     };
+
+
+    struct EventQuit {};
+    struct EventClose {};
+    struct EventMinimized {};
+    struct EventShown {};
+
+    using Events = std::variant<EventQuit, EventClose, EventMinimized, EventShown>;
+
+    using EventBus = EventBusImpl<Events>;
 }

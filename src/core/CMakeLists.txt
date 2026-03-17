@@ -3,15 +3,18 @@ set(NAME "Core")
 include(${PROJECT_SOURCE_DIR}/cmake/StaticAnalyzers.cmake)
 
 add_library(${NAME} STATIC
-  Core/Log.cpp
-  Core/Log.hpp
+  "Core/Log.cpp"
+  "Core/Log.hpp"
 
-  Core/Application.cpp
-  Core/Application.hpp
-  Core/Window.cpp
-  Core/Window.hpp
-  Core/Resources.hpp
-  Core/DPIHandler.hpp)
+  "Core/Application.cpp"
+  "Core/Application.hpp"
+  "Core/Window.cpp"
+  "Core/Window.hpp"
+  "Core/Resources.hpp"
+  "Core/DPIHandler.hpp"
+  "Core/AppModel.cpp" 
+  "Core/Renderer.cpp"
+  "Core/ImGuiPass.cpp" "Core/AppUi.cpp")
 
 # Define set of OS specific files to include
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
