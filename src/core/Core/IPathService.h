@@ -1,6 +1,6 @@
 #pragma once
-#include <filesystem>
 #include <memory>
+#include <string>
 
 namespace App
 {
@@ -12,11 +12,11 @@ namespace App
         virtual ~IPathService () = default;
 
         /** Get the path to the user configuration directory. */
-        virtual std::filesystem::path getUserConfigPath () const = 0;
+        virtual std::string getUserConfigPath () const = 0;
         /** Get the path to a font file within the application's resources. */
-        virtual std::filesystem::path getFontPath (std::string_view fontFileName) const = 0;
+        virtual std::string getFontPath (std::string_view fontFileName) const = 0;
         /** Get the path to the application's resources. */
-        virtual std::filesystem::path getResourcePath (std::string_view filePath) const = 0;
+        virtual std::string getResourcePath (std::string_view filePath) const = 0;
     };
 
     /** Factory function to create an instance of IPathService. */

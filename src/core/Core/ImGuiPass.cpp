@@ -5,7 +5,6 @@
 #include <backends/imgui_impl_sdl2.h>
 #include <backends/imgui_impl_sdlrenderer2.h>
 
-namespace fs = std::filesystem;
 using namespace App;
 using namespace std;
 
@@ -71,15 +70,13 @@ void ImGuiPass::applyPaths (const IPathService* paths)
     constexpr float baseFontSize = 18.0f;
     const float fontSize = baseFontSize * DPIHandler::get_scale ();
 
-    fs::path iniFilePath = paths->getUserConfigPath () / "imgui.ini";
+    static string iniFile = paths->getUserConfigPath ();
 
-    static u8string iniFile = iniFilePath.u8string ();
+    io.IniFilename = iniFile.c_str ();
 
-    io.IniFilename = reinterpret_cast<const char*> (iniFile.c_str ());
+    string fontFile = paths->getFontPath ("Manrope.ttf");
 
-    u8string fontFile = paths->getFontPath ("Manrope.ttf").u8string ();
-
-    ImFont* font = io.Fonts->AddFontFromFileTTF (reinterpret_cast<const char*> (fontFile.c_str ()), fontSize);
+    ImFont* font = io.Fonts->AddFontFromFileTTF (fontFile.c_str (), fontSize);
     io.FontDefault = font;
 
     DPIHandler::set_global_font_scaling (&io);

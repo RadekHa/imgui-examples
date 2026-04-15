@@ -1,5 +1,8 @@
 #pragma once
 #include "IPathService.h"
+#include "SdlWrapper.h"
+
+#include <filesystem>
 
 namespace App
 {
@@ -11,13 +14,18 @@ namespace App
         SDLPathService ();
 
         /** {@inheritDoc} */
-        virtual std::filesystem::path getUserConfigPath () const override;
+        virtual std::string getUserConfigPath () const override;
         /** {@inheritDoc} */
-        virtual std::filesystem::path getFontPath (std::string_view fontFileName) const override;
+        virtual std::string getFontPath (std::string_view fontFileName) const override;
         /** {@inheritDoc} */
-        virtual std::filesystem::path getResourcePath (std::string_view filePath) const override;
+        virtual std::string getResourcePath (std::string_view filePath) const override;
+        /** Get the base resource path. */
+        std::filesystem::path getBaseResourcePath () const;
     private:
+        /** Helper function to convert a filesystem path to a UTF-8 encoded string. */
+        std ::string toString (const std::filesystem::path& filePath) const;
+
         /** Base path obtained from SDL to construct resource paths. */
-        std::filesystem::path m_basePath;
+        sdl::SdlTextPtr m_basePath;
     };
 }

@@ -5,6 +5,7 @@
 
 namespace fs = std::filesystem;
 using namespace App;
+using namespace sdl;
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,17 +24,36 @@ SDLPathService::SDLPathService ()
 {
 }
 
-fs::path SDLPathService::getUserConfigPath () const
+string SDLPathService::getUserConfigPath () const
 {
-    return SDL_GetPrefPath (COMPANY_NAMESPACE.c_str (), APP_NAME.c_str ());
+    SdlTextPtr path {SDL_GetPrefPath (COMPANY_NAMESPACE.c_str (), APP_NAME.c_str ())};
+
+    fs::path iniFilePath{path.get ()};
+    iniFilePath /= "imgui.ini";
+
+    return toString (iniFilePath);
 }
 
-fs::path SDLPathService::getFontPath (string_view fontFileName) const
+string SDLPathService::getFontPath (string_view fontFileName) const
 {
-    return getResourcePath ("fonts") / fontFileName;
+    fs::path fontPath = getBaseResourcePath () / "fonts" / fontFileName;
+    return toString (fontPath.lexically_normal ());
 }
 
-fs::path SDLPathService::getResourcePath (string_view filePath) const
+string SDLPathService::getResourcePath (string_view filePath) const
 {
-    return m_basePath / "../share" / filePath;
+    fs::path resourcePath = getBaseResourcePath () / filePath;
+    return toString (resourcePath.lexically_normal ());
+}
+
+fs::path SDLPathService::getBaseResourcePath () const
+{
+    fs::path resourcePath = fs::path (m_basePath.get ()) / ".." / "share";
+    return resourcePath.lexically_normal ();
+}
+
+string SDLPathService::toString (const fs::path& filePath) const
+{
+    u8string fileName = filePath.u8string ();
+    return string (begin (fileName), end (fileName));
 }
