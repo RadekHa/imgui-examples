@@ -1,3 +1,4 @@
+#include "FrameContext.h"
 #include "Renderer.h"
 
 #include <SDL2/SDL_render.h>
@@ -24,9 +25,10 @@ Renderer::~Renderer ()
     SDL_DestroyRenderer (m_renderer);
 }
 
-void Renderer::beginFrame ()
+void Renderer::beginFrame (const FrameContext& ctx)
 {
-    SDL_SetRenderDrawColor (m_renderer, 45, 45, 48, 255);
+    SDL_RenderSetScale (m_renderer, ctx.scaleX, ctx.scaleY);
+    SDL_SetRenderDrawColor (m_renderer, 100, 100, 100, 255);
     SDL_RenderClear (m_renderer);
 }
 

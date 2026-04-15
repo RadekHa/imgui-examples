@@ -1,8 +1,9 @@
 #define SDL_MAIN_HANDLED
-
 #include "Core/Application.hpp"
+#include "Core/IPathService.h"
 #include "Core/Log.hpp"
 #include "tracy/Tracy.hpp"
+
 
 #include <exception>
 
@@ -17,8 +18,8 @@ int main ()
 
     try
     {
-        Application app{"App"};
-
+        unique_ptr<IPathService> paths = createSdlPathService ();
+        Application app{"App", paths.get ()};
         status = app.run ();
     }
     catch (exception& e)

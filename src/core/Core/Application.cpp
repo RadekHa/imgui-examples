@@ -1,20 +1,22 @@
 #include "Application.hpp"
-#include "Core/Log.hpp"
-#include "Core/Window.hpp"
+#include "DPIHandler.hpp"
+#include "FrameContext.h"
+#include "ImGuiConfig.h"
+#include "Log.hpp"
+#include "Resources.hpp"
+#include "Window.hpp"
 
-// #include <backends/imgui_impl_sdl2.h>
-// #include <SDL2/SDL.h>
 #include <tracy/Tracy.hpp>
 
 using namespace App;
 using namespace std;
 
-Application::Application (const string& title)
+Application::Application (const string& title, const IPathService* paths)
     : m_exitStatus {ExitStatus::SUCCESS}
     , m_isRunning {true}
     , m_window (title)
     , m_renderer (m_window.native ())
-    , m_imgui (m_window.native (), m_renderer.native ())
+    , m_imgui (m_window.native (), m_renderer.native (), paths)
 {
     ZoneScoped;
 }
@@ -38,21 +40,26 @@ ExitStatus Application::run ()
                       stop ();
                   };
 
-    EventBus::Subscription a = m_bus.subscribe<EventClose> (onStop);
-    EventBus::Subscription b = m_bus.subscribe<EventQuit> (onStop);
+    auto subClose = m_bus.subscribe<EventClose> (onStop);
+    auto subStop = m_bus.subscribe<EventQuit> (onStop);
 
 
     while (m_isRunning)
     {
         ZoneScopedN ("MainLoop");
-        m_window.pollEvents (m_bus);
+        FrameContext frameContext;
 
-        m_renderer.beginFrame ();
+        auto events = m_window.pollEvents ();
+        m_input.process (events, m_bus);
 
-        m_imgui.begin ();
+        m_imgui.beginFrame ();
+        m_imgui.fillFrameContext (frameContext);
+
+        m_renderer.beginFrame (frameContext);
+
         m_ui.update (m_model);
-        m_imgui.end ();
 
+        m_imgui.endFrame ();
         m_renderer.endFrame ();
 
         m_bus.dispatch ();
@@ -65,26 +72,3 @@ void Application::stop ()
     ZoneScoped;
     m_isRunning = false;
 }
-
-// void Application::pollEvents ()
-// {
-//    // SDL_Event event{};
-//
-//    // while (SDL_PollEvent (&event) == 1)
-//    // {
-//    //    ZoneScopedN ("EventPolling");
-//
-//    //    ImGui_ImplSDL2_ProcessEvent (&event);
-//
-//    //    if (event.type == SDL_QUIT)
-//    //    {
-//    //        stop ();
-//    //    }
-//
-//    //    if ((event.type == SDL_WINDOWEVENT) &&
-//    //        (event.window.windowID == SDL_GetWindowID (m_window->getNativeWindow ())))
-//    //    {
-//    //        m_window->onEvent (event.window);
-//    //    }
-//    // }
-// }

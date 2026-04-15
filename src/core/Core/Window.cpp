@@ -1,10 +1,6 @@
 #include "Core/DPIHandler.hpp"
 #include "Core/Log.hpp"
-// #include "Resources.hpp"
-// #include "Settings/Project.hpp"
 #include "Window.hpp"
-
-#include <backends/imgui_impl_sdl2.h>
 
 #include <SDL2/SDL.h>
 
@@ -13,19 +9,23 @@ using namespace std;
 
 Window::Window (const string& title)
 {
+    SDL_SetHint (SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
+
     if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
     {
         throw runtime_error (SDL_GetError ());
     }
-    const auto flags = static_cast<SDL_WindowFlags> (
-        SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    const auto flags = static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+
+    Window::Settings settings;
+    const WindowSize size{DPIHandler::get_dpi_aware_window_size (settings)};
 
     m_window = SDL_CreateWindow (
         title.c_str (),
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        1280,
-        800,
+        size.width,
+        size.height,
         flags);
 
     if (!m_window)
@@ -45,41 +45,17 @@ SDL_Window* Window::native () const
     return m_window;
 }
 
-void Window::pollEvents (EventBus& bus)
+vector<SDL_Event> Window::pollEvents () const
 {
+    vector<SDL_Event> events;
+
     SDL_Event e;
 
     while (SDL_PollEvent (&e))
     {
-        ImGui_ImplSDL2_ProcessEvent (&e);
-
-        switch (e.type)
-        {
-        case SDL_QUIT:
-            bus.publish (EventQuit{});
-            break;
-
-        case SDL_WINDOWEVENT:
-
-            if (e.window.windowID == SDL_GetWindowID (m_window))
-            {
-                switch (e.window.event)
-                {
-                case SDL_WINDOWEVENT_CLOSE:
-                    bus.publish (EventClose{});
-                    break;
-
-                case SDL_WINDOWEVENT_MINIMIZED:
-                    bus.publish (EventMinimized{});
-                    break;
-
-                case SDL_WINDOWEVENT_SHOWN:
-                    bus.publish (EventShown{});
-                }
-            }
-            break;
-        }
+        events.push_back (e);
     }
+    return events;
 }
 
 //

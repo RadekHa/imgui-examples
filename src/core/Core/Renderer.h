@@ -7,6 +7,8 @@ struct SDL_Renderer;
 
 namespace App
 {
+    struct FrameContext;
+
     class Renderer
     {
     public:
@@ -15,7 +17,7 @@ namespace App
 
         ~Renderer ();
 
-        void beginFrame ();
+        void beginFrame (const FrameContext& ctx);
 
         void endFrame ();
 

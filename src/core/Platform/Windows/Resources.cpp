@@ -11,7 +11,6 @@ namespace fs = std::filesystem;
 using namespace App;
 using namespace std;
 
-
 static const string BASE_PATH{SDL_GetBasePath ()};
 
 fs::path Resources::resource_path (const fs::path& file_path)

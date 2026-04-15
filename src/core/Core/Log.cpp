@@ -21,7 +21,9 @@ Log::Log ()
     const level::level_enum level{level::debug};
 
     log_sinks.emplace_back (make_shared<sinks::stdout_color_sink_mt>());
+#ifdef _WIN32
     log_sinks.emplace_back (make_shared<sinks::msvc_sink_mt>());
+#endif
     log_sinks.emplace_back (make_shared<sinks::basic_file_sink_mt> ("app.log", true));
 
     log_sinks [0]->set_pattern ("%^[%T] %n(%l): %v%$");

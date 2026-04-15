@@ -2,10 +2,11 @@
 #include "AppUi.h"
 #include "DataModel.h"
 #include "ImGuiPass.h"
+#include "InputSystem.h"
+#include "IPathService.h"
 #include "Renderer.h"
 #include "Window.hpp"
 
-#include <memory>
 #include <string>
 
 namespace App
@@ -22,7 +23,7 @@ namespace App
     {
     public:
         /** Initializes the application with a given title. */
-        explicit Application (const std::string& title);
+        explicit Application (const std::string& title, const IPathService* paths);
         /* Cleaning up resources. */
         ~Application ();
 
@@ -44,7 +45,7 @@ namespace App
     private:
         /** Exit status of the application. */
         ExitStatus m_exitStatus;
-        /* Flag indicating whether the main application loop is running. */
+        /** Flag indicating whether the main application loop is running. */
         bool m_isRunning;
 
         EventBus m_bus;
@@ -53,6 +54,8 @@ namespace App
         Renderer m_renderer;
         ImGuiPass m_imgui;
         DataModel m_model;
+        InputSystem m_input;
+
         AppUi m_ui;
     };
 }

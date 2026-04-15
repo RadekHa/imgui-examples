@@ -12,9 +12,9 @@ add_library(${NAME} STATIC
   "Core/Window.hpp"
   "Core/Resources.hpp"
   "Core/DPIHandler.hpp"
-  "Core/AppModel.cpp" 
+   
   "Core/Renderer.cpp"
-  "Core/ImGuiPass.cpp" "Core/AppUi.cpp")
+  "Core/ImGuiPass.cpp" "Core/AppUi.cpp" "Core/InputSystem.cpp" "Core/SdlPathService.cpp")
 
 # Define set of OS specific files to include
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")

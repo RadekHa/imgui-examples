@@ -116,12 +116,9 @@ namespace App
         template<typename Event, typename Obj>
         Subscription subscribe (Obj* object, void (Obj::* method) (const Event &))
         {
-            return subscribe<Event> (
-                [object, method] (const Event& e)
-            {
+            return subscribe<Event> ( [object, method] (const Event& e) {
                 (object->*method)(e);
-            }
-                );
+            });
         }
 
     public:
@@ -155,10 +152,7 @@ namespace App
 
             for (auto& h : vec)
             {
-                if (h.fn)
-                {
-                    h.fn (e);
-                }
+                h.fn (e);
             }
         }
 
@@ -189,15 +183,9 @@ namespace App
         void removeFromVector (SubscriptionId id)
         {
             auto& vec = getVector<Event>();
-
-            for (auto& h : vec)
-            {
-                if (h.id == id)
-                {
-                    h.fn = nullptr;
-                    break;
-                }
-            }
+            vec.erase (std::remove_if (vec.begin (), vec.end (), [id] (const auto& h) {
+                return h.id == id;
+            }), vec.end ());
         }
 
     private:
