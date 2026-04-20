@@ -1,9 +1,6 @@
 #include "Application.hpp"
-#include "DPIHandler.hpp"
 #include "FrameContext.h"
-#include "ImGuiConfig.h"
 #include "Log.hpp"
-#include "Resources.hpp"
 #include "Window.hpp"
 
 #include <tracy/Tracy.hpp>

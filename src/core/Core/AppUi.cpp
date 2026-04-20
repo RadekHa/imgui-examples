@@ -53,7 +53,7 @@ void AppUi::drawFpsGraph ()
     avg /= IM_ARRAYSIZE (values);
 
     char overlay [32];
-    sprintf (overlay, "AVG %.1f FPS", avg);
+    snprintf (overlay, sizeof (overlay), "AVG %.1f FPS", avg);
 
     ImGui::Begin ("Stats");
 
