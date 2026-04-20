@@ -10,22 +10,25 @@ add_library(${NAME} STATIC
   "Core/Application.hpp"
   "Core/Window.cpp"
   "Core/Window.hpp"
-  "Core/Resources.hpp"
   "Core/DPIHandler.hpp"
    
   "Core/Renderer.cpp"
-  "Core/ImGuiPass.cpp" "Core/AppUi.cpp" "Core/InputSystem.cpp" "Core/SdlPathService.cpp")
+  "Core/ImGuiPass.cpp"
+  "Core/AppUi.cpp"
+  "Core/InputSystem.cpp"
+  "Core/SdlPathService.cpp"
+)
 
 # Define set of OS specific files to include
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
   target_sources(${NAME} PRIVATE
-    Platform/Windows/Resources.cpp Platform/Windows/DPIHandler.cpp)
+    Platform/Windows/DPIHandler.cpp)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   target_sources(${NAME} PRIVATE
-    Platform/Mac/Resources.cpp Platform/Mac/DPIHandler.cpp)
+    Platform/Mac/DPIHandler.cpp)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_sources(${NAME} PRIVATE
-    Platform/Linux/Resources.cpp Platform/Linux/DPIHandler.cpp)
+    Platform/Linux/DPIHandler.cpp)
 endif ()
 
 target_include_directories(${NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

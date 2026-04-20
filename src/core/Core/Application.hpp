@@ -1,6 +1,7 @@
 #pragma once
 #include "AppUi.h"
 #include "DataModel.h"
+#include "EventBus.h"
 #include "ImGuiPass.h"
 #include "InputSystem.h"
 #include "IPathService.h"
