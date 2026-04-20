@@ -11,8 +11,8 @@ namespace App
         /** Virtual destructor to allow proper cleanup of derived classes. */
         virtual ~IPathService () = default;
 
-        /** Get the path to the user configuration directory. */
-        virtual std::string getUserConfigPath () const = 0;
+        /** Get the path to the user configuration file. */
+        virtual const char* getUserConfigFilePath () const = 0;
         /** Get the path to a font file within the application's resources. */
         virtual std::string getFontPath (std::string_view fontFileName) const = 0;
         /** Get the path to the application's resources. */

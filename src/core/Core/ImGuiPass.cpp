@@ -70,9 +70,7 @@ void ImGuiPass::applyPaths (const IPathService* paths)
     constexpr float baseFontSize = 18.0f;
     const float fontSize = baseFontSize * DPIHandler::get_scale ();
 
-    static string iniFile = paths->getUserConfigPath ();
-
-    io.IniFilename = iniFile.c_str ();
+    io.IniFilename = paths->getUserConfigFilePath ();
 
     string fontFile = paths->getFontPath ("Manrope.ttf");
 

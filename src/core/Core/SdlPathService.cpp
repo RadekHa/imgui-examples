@@ -22,16 +22,16 @@ unique_ptr<IPathService> App::createSdlPathService ()
 SDLPathService::SDLPathService ()
     : m_basePath {SDL_GetBasePath ()}
 {
-}
-
-string SDLPathService::getUserConfigPath () const
-{
-    SdlTextPtr path {SDL_GetPrefPath (COMPANY_NAMESPACE.c_str (), APP_NAME.c_str ())};
-
+    SdlTextPtr path{SDL_GetPrefPath (COMPANY_NAMESPACE.c_str (), APP_NAME.c_str ())};
     fs::path iniFilePath{path.get ()};
     iniFilePath /= "imgui.ini";
 
-    return toString (iniFilePath);
+    m_userConfigPath = toString (iniFilePath);
+}
+
+const char* SDLPathService::getUserConfigFilePath () const
+{
+    return m_userConfigPath.c_str ();
 }
 
 string SDLPathService::getFontPath (string_view fontFileName) const

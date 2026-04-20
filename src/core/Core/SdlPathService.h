@@ -14,7 +14,7 @@ namespace App
         SDLPathService ();
 
         /** {@inheritDoc} */
-        virtual std::string getUserConfigPath () const override;
+        virtual const char* getUserConfigFilePath () const override;
         /** {@inheritDoc} */
         virtual std::string getFontPath (std::string_view fontFileName) const override;
         /** {@inheritDoc} */
@@ -27,5 +27,7 @@ namespace App
 
         /** Base path obtained from SDL to construct resource paths. */
         sdl::SdlTextPtr m_basePath;
+        /** Cached user configuration path to avoid redundant SDL calls. */
+        std::string m_userConfigPath;
     };
 }
