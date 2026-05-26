@@ -148,9 +148,10 @@ namespace App
         template<typename Event>
         void dispatchSingle (const Event& e)
         {
-            auto& vec = getVector<Event>();
+            // Copy handlers to avoid issues with handlers being modified during dispatch.
+            HandlerList<Event> handlers = getVector<Event>();
 
-            for (auto& h : vec)
+            for (auto& h : handlers)
             {
                 h.fn (e);
             }
