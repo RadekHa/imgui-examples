@@ -5,32 +5,37 @@
 typedef struct SDL_Window SDL_Window;
 /** Forward class declaration of SDL renderer. */
 struct SDL_Renderer;
-
+/** Forward class declaration of ImGuiIO structure. */
 struct ImGuiIO;
 
 namespace App
 {
+    /** Forward declaration of FrameContext struct. */
     struct FrameContext;
-
+    /** Forward declaration of ImGuiConfig struct. */
     struct ImGuiConfig;
 
+    /** Manages the ImGui rendering pass, including initialization, frame management, and resource cleanup. */
     class ImGuiPass
     {
     public:
-
+        /** Initialize ImGui context and set up SDL renderer bindings. */
         ImGuiPass (SDL_Window* window, SDL_Renderer* renderer, const IPathService* paths);
-
+        /** Clean up ImGui resources and shut down SDL bindings. */
         ~ImGuiPass ();
 
+        /** Start a new ImGui frame. */
         void beginFrame ();
-
+        /** End the current ImGui frame and render the draw data. */
         void endFrame ();
-
+        /** Fill the provided FrameContext with ImGui-related information for the current frame. */
         void fillFrameContext (FrameContext& ctx) const;
 
     private:
+        /** Apply paths from the IPathService to ImGui configuration, such as loading fonts. */
         void applyPaths (const IPathService* paths);
 
+        /** Pointer to the SDL renderer used for rendering ImGui draw data. */
         SDL_Renderer* m_renderer;
     };
 }

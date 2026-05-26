@@ -59,6 +59,7 @@ ExitStatus Application::run ()
         m_imgui.endFrame ();
         m_renderer.endFrame ();
 
+        // Dispatch events after processing the frame.
         m_bus.dispatch ();
     }
     return ExitStatus::SUCCESS;

@@ -39,7 +39,6 @@ namespace App
 
         /** Runs the main application loop and returns the exit status. */
         ExitStatus run ();
-
         /** Stops the application. */
         void stop ();
 
@@ -49,14 +48,19 @@ namespace App
         /** Flag indicating whether the main application loop is running. */
         bool m_isRunning;
 
+        /* The event bus for handling application events. */
         EventBus m_bus;
-
+        /* The main application window. */
         Window m_window;
+        /* The renderer for drawing to the window. */
         Renderer m_renderer;
+        /* The ImGui pass for rendering the UI. */
         ImGuiPass m_imgui;
+        /* The data model representing the state of the application. */
         DataModel m_model;
+        /* The input system for processing user input. */
         InputSystem m_input;
-
+        /** The user interface for the application. */
         AppUi m_ui;
     };
 }

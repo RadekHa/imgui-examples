@@ -4,7 +4,6 @@
 #include "Core/Log.hpp"
 #include "tracy/Tracy.hpp"
 
-
 #include <exception>
 
 using namespace App;
