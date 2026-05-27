@@ -38,6 +38,10 @@ void InputSystem::translate (const SDL_Event& e, EventBus& bus)
         case SDL_WINDOWEVENT_SHOWN:
             bus.publish (EventShown{});
             break;
+
+        case SDL_WINDOWEVENT_RESTORED:
+            bus.publish (EventRestored{});
+            break;
         }
     }
 }

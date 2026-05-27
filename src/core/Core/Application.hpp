@@ -39,17 +39,24 @@ namespace App
 
         /** Runs the main application loop and returns the exit status. */
         ExitStatus run ();
+
+    private:
         /** Stops the application. */
         void stop ();
 
-    private:
+        void init ();
+
         /** Exit status of the application. */
         ExitStatus m_exitStatus;
         /** Flag indicating whether the main application loop is running. */
         bool m_isRunning;
+        /* Flag indicating whether the application window is currently minimized. */
+        bool m_isMinimized;
 
         /* The event bus for handling application events. */
         EventBus m_bus;
+        /* Vector of subscriptions to application events, allowing for automatic unsubscription when the Application object is destroyed. */
+        std::vector<EventBus::Subscription> m_subscriptions;
         /* The main application window. */
         Window m_window;
         /* The renderer for drawing to the window. */

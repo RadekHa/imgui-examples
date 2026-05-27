@@ -135,6 +135,15 @@ namespace App
             });
         }
 
+        /** Subscribes a member function of an object that takes no parameters to a specific event type, returning a Subscription object that can be used to manage the subscription. */
+        template<typename Event, typename Obj>
+        Subscription subscribe (Obj* object, void (Obj::* method) ())
+        {
+            return subscribe<Event> ( [object, method] (const Event&) {
+                (object->*method)();
+            });
+        }
+
     public:
         /** Publishes an event to all subscribers of that event type. */
         template<typename Event>
@@ -244,9 +253,11 @@ namespace App
     struct EventMinimized {};
     /** Event representing a shown request. */
     struct EventShown {};
+    /** Event representing a restored request. */
+    struct EventRestored {};
 
     /** Type alias for the variant of all events used in the application. */
-    using Events = std::variant<EventQuit, EventClose, EventMinimized, EventShown>;
+    using Events = std::variant<EventQuit, EventClose, EventMinimized, EventShown, EventRestored>;
 
     /** Type alias for the event bus used in the application, based on the defined events. */
     using EventBus = EventBusImpl<Events>;
