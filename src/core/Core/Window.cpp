@@ -11,12 +11,6 @@ using namespace std;
 Window::Window (const string& title)
     : m_context {new SDLContext}
 {
-    SDL_SetHint (SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
-
-    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
-    {
-        throw runtime_error (SDL_GetError ());
-    }
     const auto flags = static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     Window::Settings settings;

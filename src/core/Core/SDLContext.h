@@ -11,7 +11,7 @@ namespace App
         ~SDLContext ();
         /** The copy constructor is deleted to prevent copying of the SDLContext. */
         SDLContext (const SDLContext&) = delete;
-        /** The move constructor is deleted to prevent moving of the SDLContext. */
+        /** The copy assignment operator is deleted to prevent copying of the SDLContext. */
         SDLContext& operator= (const SDLContext&) = delete;
     };
 }
