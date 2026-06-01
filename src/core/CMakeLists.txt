@@ -5,18 +5,18 @@ include(${PROJECT_SOURCE_DIR}/cmake/StaticAnalyzers.cmake)
 add_library(${NAME} STATIC
   "Core/Log.cpp"
   "Core/Log.hpp"
-
   "Core/Application.cpp"
   "Core/Application.hpp"
   "Core/Window.cpp"
   "Core/Window.hpp"
   "Core/DPIHandler.hpp"
-   
   "Core/Renderer.cpp"
   "Core/ImGuiPass.cpp"
   "Core/AppUi.cpp"
   "Core/InputSystem.cpp"
   "Core/SdlPathService.cpp"
+  "Core/SDLContext.cpp"
+  "Core/SDLContext.h"
 )
 
 # Define set of OS specific files to include

@@ -7,10 +7,10 @@
 using namespace App;
 using namespace std;
 
-Window::Window (const string& title)
-{
-    // TODO RHA 2023-05-29 Add SDLContext to manage SDL initialization and quitting, and move this there.
 
+Window::Window (const string& title)
+    : m_context {new SDLContext}
+{
     SDL_SetHint (SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
 
     if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
@@ -32,7 +32,6 @@ Window::Window (const string& title)
 
     if (!m_window)
     {
-        SDL_Quit ();
         throw runtime_error (SDL_GetError ());
     }
 }
@@ -40,7 +39,6 @@ Window::Window (const string& title)
 Window::~Window ()
 {
     SDL_DestroyWindow (m_window);
-    SDL_Quit ();
 }
 
 SDL_Window* Window::native () const
