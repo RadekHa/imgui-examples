@@ -1,9 +1,12 @@
 #include "DPIHandler.hpp"
 #include "FrameContext.h"
 #include "ImGuiPass.h"
+#include "Log.hpp"
 
 #include <backends/imgui_impl_sdl2.h>
 #include <backends/imgui_impl_sdlrenderer2.h>
+
+#include <stdexcept>
 
 using namespace App;
 using namespace std;
@@ -11,7 +14,12 @@ using namespace std;
 ImGuiPass::ImGuiPass (SDL_Window* window, SDL_Renderer* renderer, const IPathService* paths)
     : m_renderer (renderer)
 {
+    if ((window == nullptr) || (renderer == nullptr) || (paths == nullptr))
+    {
+        throw invalid_argument ("ImGuiPass received null dependency");
+    }
     IMGUI_CHECKVERSION ();
+
     ImGui::CreateContext ();
 
     ImGuiIO& io = ImGui::GetIO ();
@@ -75,7 +83,14 @@ void ImGuiPass::applyPaths (const IPathService* paths)
     string fontFile = paths->getFontPath ("Manrope.ttf");
 
     ImFont* font = io.Fonts->AddFontFromFileTTF (fontFile.c_str (), fontSize);
-    io.FontDefault = font;
 
+    if (font)
+    {
+        io.FontDefault = font;
+    }
+    else
+    {
+        APP_WARN ("Failed to load font from path: %s", fontFile.c_str ());
+    }
     DPIHandler::set_global_font_scaling (&io);
 }

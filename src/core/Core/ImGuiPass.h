@@ -24,6 +24,15 @@ namespace App
         /** Clean up ImGui resources and shut down SDL bindings. */
         ~ImGuiPass ();
 
+        /** The copy constructor is deleted to prevent copying of the ImGuiPass instance. */
+        ImGuiPass (const ImGuiPass&) = delete;
+        /** The copy assignment operator is deleted to prevent copying of the ImGuiPass instance. */
+        ImGuiPass& operator= (const ImGuiPass&) = delete;
+        /** The move constructor is deleted to prevent moving of the ImGuiPass instance. */
+        ImGuiPass (ImGuiPass&&) = delete;
+        /** The move assignment operator is deleted to prevent moving of the ImGuiPass instance. */
+        ImGuiPass& operator= (ImGuiPass&&) = delete;
+
         /** Start a new ImGui frame. */
         void beginFrame ();
         /** End the current ImGui frame and render the draw data. */

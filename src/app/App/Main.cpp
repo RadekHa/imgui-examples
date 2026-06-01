@@ -18,8 +18,17 @@ int main ()
     try
     {
         unique_ptr<IPathService> paths = createSdlPathService ();
-        Application app{"App", paths.get ()};
-        status = app.run ();
+
+        if (paths)
+        {
+            Application app{"App", paths.get ()};
+            status = app.run ();
+        }
+        else
+        {
+            APP_ERROR ("Failed to create SDL path service.");
+            status = ExitStatus::FAILURE;
+        }
     }
     catch (exception& e)
     {
