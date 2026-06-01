@@ -9,7 +9,7 @@ using namespace std;
 
 
 Window::Window (const string& title)
-    : m_context {new SDLContext}
+    : m_context {new SdlContext}
 {
     const auto flags = static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 

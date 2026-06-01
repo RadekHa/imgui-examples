@@ -42,6 +42,6 @@ namespace App
         /** The native SDL window pointer. */
         SDL_Window* m_window;
         /** Unique pointer to the SDL context, ensuring proper initialization and cleanup of SDL resources. */
-        std::unique_ptr<SDLContext> m_context;
+        std::unique_ptr<SdlContext> m_context;
     };
 }
