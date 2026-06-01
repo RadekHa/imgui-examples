@@ -31,8 +31,15 @@ ImGuiPass::ImGuiPass (SDL_Window* window, SDL_Renderer* renderer, const IPathSer
 
     applyPaths (paths);
 
-    ImGui_ImplSDL2_InitForSDLRenderer (window, renderer);
-    ImGui_ImplSDLRenderer2_Init (renderer);
+    if (!ImGui_ImplSDL2_InitForSDLRenderer (window, renderer))
+    {
+        throw runtime_error ("ImGui_ImplSDL2_InitForSDLRenderer failed");
+    }
+
+    if (!ImGui_ImplSDLRenderer2_Init (renderer))
+    {
+        throw runtime_error ("ImGui_ImplSDLRenderer2_Init failed");
+    }
 }
 
 ImGuiPass::~ImGuiPass ()
