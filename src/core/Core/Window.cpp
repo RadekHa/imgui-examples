@@ -3,60 +3,51 @@
 #include "Window.hpp"
 
 #include <SDL2/SDL.h>
-#include <tracy/Tracy.hpp>
 
 using namespace App;
+using namespace std;
 
 
-Window::Window (const Settings& settings)
-    : m_window {}
-    , m_renderer {}
+Window::Window (const string& title)
+    : m_context {new SDLContext}
 {
-    ZoneScoped;
+    const auto flags = static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
-    const auto window_flags{
-        static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI)
-    };
-
+    Window::Settings settings;
     const WindowSize size{DPIHandler::get_dpi_aware_window_size (settings)};
 
-    m_window = SDL_CreateWindow (settings.title.c_str (),
-                                 SDL_WINDOWPOS_CENTERED,
-                                 SDL_WINDOWPOS_CENTERED,
-                                 size.width,
-                                 size.height,
-                                 window_flags);
+    m_window = SDL_CreateWindow (
+        title.c_str (),
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        size.width,
+        size.height,
+        flags);
 
-    Uint32 renderer_flags{SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED};
-    m_renderer = SDL_CreateRenderer (m_window, -1, renderer_flags);
-
-    if (m_renderer == nullptr)
+    if (!m_window)
     {
-        APP_ERROR ("Error creating SDL_Renderer!");
-        return;
+        throw runtime_error (SDL_GetError ());
     }
-    SDL_RendererInfo info;
-    SDL_GetRendererInfo (m_renderer, &info);
-
-    APP_DEBUG ("Current SDL_Renderer: {}", info.name);
 }
 
 Window::~Window ()
 {
-    ZoneScoped;
-
-    SDL_DestroyRenderer (m_renderer);
     SDL_DestroyWindow (m_window);
 }
 
-SDL_Window* Window::getNativeWindow () const
+SDL_Window* Window::native () const
 {
-    ZoneScoped;
     return m_window;
 }
 
-SDL_Renderer* Window::getNativeRenderer () const
+void Window::pollEvents (vector<SDL_Event>& events) const
 {
-    ZoneScoped;
-    return m_renderer;
+    events.clear ();
+
+    SDL_Event e;
+
+    while (SDL_PollEvent (&e))
+    {
+        events.push_back (e);
+    }
 }

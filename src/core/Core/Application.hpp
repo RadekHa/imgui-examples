@@ -1,9 +1,13 @@
 #pragma once
-#include "Core/Window.hpp"
+#include "AppUi.h"
+#include "DataModel.h"
+#include "EventBus.h"
+#include "ImGuiPass.h"
+#include "InputSystem.h"
+#include "IPathService.h"
+#include "Renderer.h"
+#include "Window.hpp"
 
-#include <SDL2/SDL.h>
-
-#include <memory>
 #include <string>
 
 namespace App
@@ -20,7 +24,7 @@ namespace App
     {
     public:
         /** Initializes the application with a given title. */
-        explicit Application (const std::string& title);
+        explicit Application (const std::string& title, const IPathService* paths);
         /* Cleaning up resources. */
         ~Application ();
 
@@ -36,28 +40,34 @@ namespace App
         /** Runs the main application loop and returns the exit status. */
         ExitStatus run ();
 
+    private:
         /** Stops the application. */
         void stop ();
+        /** Initializes the application, setting up necessary resources and state. */
+        void init ();
 
-        /** Handle SDL events. */
-        void onEvent (const SDL_WindowEvent& event);
-        /** Handle window minimize event. */
-        void onMinimize ();
-        /** Handle window restore event. */
-        void onShown ();
-        /** Handle window close event. */
-        void onClose ();
-
-    private:
         /** Exit status of the application. */
         ExitStatus m_exitStatus;
-        /** Unique pointer to the application window. */
-        std::unique_ptr<Window> m_window{nullptr};
+        /** Flag indicating whether the main application loop is running. */
+        bool m_isRunning;
+        /* Flag indicating whether the application window is currently minimized. */
+        bool m_isMinimized;
 
-        bool m_running;
-        bool m_minimized;
-        bool m_show_some_panel;
-        bool m_show_debug_panel;
-        bool m_show_demo_panel;
+        /* The event bus for handling application events. */
+        EventBus m_bus;
+        /* Vector of subscriptions to application events, allowing for automatic unsubscription when the Application object is destroyed. */
+        std::vector<EventBus::Subscription> m_subscriptions;
+        /* The main application window. */
+        Window m_window;
+        /* The renderer for drawing to the window. */
+        Renderer m_renderer;
+        /* The ImGui pass for rendering the UI. */
+        ImGuiPass m_imgui;
+        /* The data model representing the state of the application. */
+        DataModel m_model;
+        /* The input system for processing user input. */
+        InputSystem m_input;
+        /** The user interface for the application. */
+        AppUi m_ui;
     };
 }

@@ -1,10 +1,11 @@
 # Test cases
-set(NAME "ResourcesTest")
+set(NAME "CoreTest")
 
 add_executable(${NAME})
 
 target_sources(${NAME}
 PUBLIC
+   EventBusTest.cpp
    Resources.spec.cpp
 )
 
