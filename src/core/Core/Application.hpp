@@ -43,7 +43,7 @@ namespace App
     private:
         /** Stops the application. */
         void stop ();
-
+        /** Initializes the application, setting up necessary resources and state. */
         void init ();
 
         /** Exit status of the application. */

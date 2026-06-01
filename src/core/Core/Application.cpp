@@ -35,12 +35,14 @@ ExitStatus Application::run ()
     }
     m_isRunning = true;
 
+    vector<SDL_Event> events;
+
     while (m_isRunning)
     {
         ZoneScopedN ("MainLoop");
         FrameContext frameContext;
 
-        auto events = m_window.pollEvents ();
+        m_window.pollEvents (events);
         m_input.process (events, m_bus);
 
         m_imgui.beginFrame ();

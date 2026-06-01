@@ -33,7 +33,7 @@ namespace App
         /** Returns the native SDL window pointer. */
         SDL_Window* native () const;
         /* Polls and returns a vector of SDL events. */
-        std::vector<SDL_Event> pollEvents () const;
+        void pollEvents (std::vector<SDL_Event>& events) const;
 
     private:
         /* The native SDL window pointer. */

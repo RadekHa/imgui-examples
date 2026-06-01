@@ -9,6 +9,8 @@ using namespace std;
 
 Window::Window (const string& title)
 {
+    // TODO RHA 2023-05-29 Add SDLContext to manage SDL initialization and quitting, and move this there.
+
     SDL_SetHint (SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
 
     if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
@@ -30,6 +32,7 @@ Window::Window (const string& title)
 
     if (!m_window)
     {
+        SDL_Quit ();
         throw runtime_error (SDL_GetError ());
     }
 }
@@ -45,9 +48,9 @@ SDL_Window* Window::native () const
     return m_window;
 }
 
-vector<SDL_Event> Window::pollEvents () const
+void Window::pollEvents (vector<SDL_Event>& events) const
 {
-    vector<SDL_Event> events;
+    events.clear ();
 
     SDL_Event e;
 
@@ -55,5 +58,4 @@ vector<SDL_Event> Window::pollEvents () const
     {
         events.push_back (e);
     }
-    return events;
 }
