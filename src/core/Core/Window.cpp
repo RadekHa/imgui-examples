@@ -1,8 +1,6 @@
-#include "Core/DPIHandler.hpp"
-#include "Core/Log.hpp"
+#include "DPIHandler.hpp"
+#include "Log.hpp"
 #include "Window.hpp"
-
-#include <SDL2/SDL.h>
 
 using namespace App;
 using namespace std;
