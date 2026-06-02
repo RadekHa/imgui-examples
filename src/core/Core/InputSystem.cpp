@@ -42,6 +42,10 @@ void InputSystem::translate (const SDL_Event& e, EventBus& bus)
         case SDL_WINDOWEVENT_RESTORED:
             bus.publish (EventRestored{});
             break;
+
+        case SDL_WINDOWEVENT_DISPLAY_CHANGED:
+            bus.publish (EventDisplayChanged{.displayIndex = e.window.data1});
+            break;
         }
     }
 }

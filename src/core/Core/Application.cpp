@@ -78,4 +78,8 @@ void Application::init ()
     m_subscriptions.emplace_back (m_bus.subscribe<EventRestored> ( [this] (const auto&) {
         m_isMinimized = false;
     }));
+
+    m_subscriptions.emplace_back (m_bus.subscribe<EventDisplayChanged> ( [this] (const auto& e) {
+        APP_INFO ("Display changed: {}", e.displayIndex);
+    }));
 }
