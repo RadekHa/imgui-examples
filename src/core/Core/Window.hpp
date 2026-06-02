@@ -1,6 +1,4 @@
 #pragma once
-#include "SDLContext.h"
-
 #include <SDL_events.h>
 
 #include <memory>
@@ -41,7 +39,5 @@ namespace App
     private:
         /** The native SDL window pointer. */
         SDL_Window* m_window;
-        /** Unique pointer to the SDL context, ensuring proper initialization and cleanup of SDL resources. */
-        std::unique_ptr<SdlContext> m_context;
     };
 }

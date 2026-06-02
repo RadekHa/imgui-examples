@@ -2,6 +2,7 @@
 #include "Core/Application.hpp"
 #include "Core/IPathService.h"
 #include "Core/Log.hpp"
+#include "Core/SdlContext.h"
 #include "tracy/Tracy.hpp"
 
 #include <exception>
@@ -18,6 +19,7 @@ int main ()
     try
     {
         unique_ptr<IPathService> paths = createSdlPathService ();
+        auto context = make_unique<SdlContext>();
 
         if (paths)
         {
