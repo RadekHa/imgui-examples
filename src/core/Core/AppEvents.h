@@ -1,0 +1,15 @@
+#pragma once
+
+namespace App
+{
+    /** Event representing a quit request. */
+    struct EventQuit {};
+    /** Event representing a close request. */
+    struct EventClose {};
+    /** Event representing a minimized request. */
+    struct EventMinimized {};
+    /** Event representing a shown request. */
+    struct EventShown {};
+    /** Event representing a restored request. */
+    struct EventRestored {};
+}
