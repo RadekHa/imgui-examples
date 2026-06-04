@@ -1,6 +1,6 @@
 #include "SdlEventTranslator.h"
 
-#include <backends/imgui_impl_sdl2.h>
+#include <SDL_events.h>
 
 using namespace App;
 using namespace std;
@@ -9,8 +9,6 @@ void SdlEventTranslator::process (const vector<SDL_Event>& events, EventBus& bus
 {
     for (const auto& e : events)
     {
-        ImGui_ImplSDL2_ProcessEvent (&e);
-
         translate (e, bus);
     }
 }

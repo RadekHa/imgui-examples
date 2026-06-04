@@ -1,8 +1,12 @@
 #pragma once
 #include "IPathService.h"
 
+#include <vector>
+
 /** Forward class declaration of SDL window. */
 typedef struct SDL_Window SDL_Window;
+/** Forward class declaration of SDL event. */
+typedef union SDL_Event SDL_Event;
 /** Forward class declaration of SDL renderer. */
 struct SDL_Renderer;
 /** Forward class declaration of ImGuiIO structure. */
@@ -34,7 +38,7 @@ namespace App
         ImGuiPass& operator= (ImGuiPass&&) = delete;
 
         /** Start a new ImGui frame. */
-        void beginFrame ();
+        void beginFrame (const std::vector<SDL_Event>& events);
         /** End the current ImGui frame and render the draw data. */
         void endFrame ();
         /** Fill the provided FrameContext with ImGui-related information for the current frame. */

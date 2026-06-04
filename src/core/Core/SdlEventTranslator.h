@@ -1,8 +1,10 @@
 #pragma once
 #include "EventBus.h"
-#include "SDL_events.h"
 
 #include <vector>
+
+/** Forward class declaration of SDL event. */
+typedef union SDL_Event SDL_Event;
 
 namespace App
 {

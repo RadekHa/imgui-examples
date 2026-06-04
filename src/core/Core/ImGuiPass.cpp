@@ -5,6 +5,7 @@
 
 #include <backends/imgui_impl_sdl2.h>
 #include <backends/imgui_impl_sdlrenderer2.h>
+#include <SDL_events.h>
 
 #include <stdexcept>
 
@@ -51,8 +52,12 @@ ImGuiPass::~ImGuiPass ()
     ImGui::DestroyContext ();
 }
 
-void ImGuiPass::beginFrame ()
+void ImGuiPass::beginFrame (const vector<SDL_Event>& events)
 {
+    for (const auto& e : events)
+    {
+        ImGui_ImplSDL2_ProcessEvent (&e);
+    }
     ImGui_ImplSDLRenderer2_NewFrame ();
     ImGui_ImplSDL2_NewFrame ();
     ImGui::NewFrame ();
