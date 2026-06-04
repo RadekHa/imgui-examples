@@ -93,7 +93,7 @@ void ImGuiPass::rebuildFonts (float scale)
 
     ImGui_ImplSDLRenderer2_CreateDeviceObjects ();
 
-    //
+    // Reset style to default and apply scaling.
     ImGuiStyle& style = ImGui::GetStyle ();
     style = ImGuiStyle ();
     style.ScaleAllSizes (scale);

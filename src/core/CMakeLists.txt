@@ -10,7 +10,7 @@ add_library(${NAME} STATIC
   "Core/EventBus.h"
   "Core/EventBusImpl.h"
   "Core/ImGuiPass.cpp"
-  "Core/InputSystem.cpp"
+  "Core/SdlEventTranslator.cpp"
   "Core/Log.cpp"
   "Core/Log.hpp"
   "Core/Renderer.cpp"

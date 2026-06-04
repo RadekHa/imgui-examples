@@ -3,9 +3,9 @@
 #include "DataModel.h"
 #include "EventBus.h"
 #include "ImGuiPass.h"
-#include "InputSystem.h"
 #include "IPathService.h"
 #include "Renderer.h"
+#include "SdlEventTranslator.h"
 #include "Window.hpp"
 
 #include <string>
@@ -66,7 +66,7 @@ namespace App
         /* The data model representing the state of the application. */
         DataModel m_model;
         /* The input system for processing user input. */
-        InputSystem m_input;
+        SdlEventTranslator m_input;
         /** The user interface for the application. */
         AppUi m_ui;
     };

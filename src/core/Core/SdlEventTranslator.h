@@ -7,7 +7,7 @@
 namespace App
 {
     /** Class responsible for processing SDL events and translating them into application events. */
-    class InputSystem
+    class SdlEventTranslator
     {
     public:
         /** Processes a vector of SDL events and translates them into application events using the provided event bus. */

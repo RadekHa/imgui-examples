@@ -17,8 +17,8 @@ Window::Window (const string& title)
         title.c_str (),
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        settings.width * m_scale,
-        settings.height * m_scale,
+        static_cast<int> (settings.width * m_scale),
+        static_cast<int> (settings.height * m_scale),
         flags);
 
     if (!m_window)
