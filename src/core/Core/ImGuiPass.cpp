@@ -1,4 +1,4 @@
-#include "DPIHandler.hpp"
+#include "DpiHandler.h"
 #include "FrameContext.h"
 #include "ImGuiPass.h"
 #include "Log.hpp"
@@ -12,7 +12,8 @@ using namespace App;
 using namespace std;
 
 ImGuiPass::ImGuiPass (SDL_Window* window, SDL_Renderer* renderer, const IPathService* paths)
-    : m_renderer (renderer)
+    : m_renderer {renderer}
+    , m_paths {paths}
 {
     if ((window == nullptr) || (renderer == nullptr) || (paths == nullptr))
     {
@@ -29,7 +30,8 @@ ImGuiPass::ImGuiPass (SDL_Window* window, SDL_Renderer* renderer, const IPathSer
         ImGuiConfigFlags_DockingEnable |
         ImGuiConfigFlags_ViewportsEnable;
 
-    applyPaths (paths);
+    float scale = DpiHandler::getScale (window);
+    applyPaths (scale);
 
     if (!ImGui_ImplSDL2_InitForSDLRenderer (window, renderer))
     {
@@ -78,16 +80,35 @@ void ImGuiPass::fillFrameContext (FrameContext& ctx) const
     ctx.scaleY = io.DisplayFramebufferScale.y;
 }
 
-void ImGuiPass::applyPaths (const IPathService* paths)
+void ImGuiPass::rebuildFonts (float scale)
+{
+    ImGuiIO& io = ImGui::GetIO ();
+
+    ImGui_ImplSDLRenderer2_DestroyDeviceObjects ();
+
+    io.Fonts->Clear ();
+    io.FontDefault = nullptr;
+    applyPaths (scale);
+    io.Fonts->Build ();
+
+    ImGui_ImplSDLRenderer2_CreateDeviceObjects ();
+
+    //
+    ImGuiStyle& style = ImGui::GetStyle ();
+    style = ImGuiStyle ();
+    style.ScaleAllSizes (scale);
+}
+
+void ImGuiPass::applyPaths (float scale)
 {
     ImGuiIO& io = ImGui::GetIO ();
 
     constexpr float baseFontSize = 18.0f;
-    const float fontSize = baseFontSize * DPIHandler::get_scale ();
+    const float fontSize = baseFontSize * scale;
 
-    io.IniFilename = paths->getUserConfigFilePath ();
+    io.IniFilename = m_paths->getUserConfigFilePath ();
 
-    string fontFile = paths->getFontPath ("Manrope.ttf");
+    string fontFile = m_paths->getFontPath ("Manrope.ttf");
 
     ImFont* font = io.Fonts->AddFontFromFileTTF (fontFile.c_str (), fontSize);
 
@@ -97,7 +118,6 @@ void ImGuiPass::applyPaths (const IPathService* paths)
     }
     else
     {
-        APP_WARN ("Failed to load font from path: %s", fontFile.c_str ());
+        APP_WARN ("Failed to load font from path: {}", fontFile.c_str ());
     }
-    DPIHandler::set_global_font_scaling (&io);
 }

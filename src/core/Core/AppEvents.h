@@ -17,6 +17,6 @@ namespace App
     struct EventDisplayChanged
     {
         /** The index of the new display. */
-        std::int32_t displayIndex;
+        int32_t displayIndex;
     };
 }

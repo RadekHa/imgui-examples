@@ -1,7 +1,6 @@
 #pragma once
 #include <SDL_events.h>
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -36,8 +35,11 @@ namespace App
         /* Polls and returns a vector of SDL events. */
         void pollEvents (std::vector<SDL_Event>& events) const;
 
+        void resize (float scale);
     private:
         /** The native SDL window pointer. */
         SDL_Window* m_window;
+
+        float m_scale;
     };
 }

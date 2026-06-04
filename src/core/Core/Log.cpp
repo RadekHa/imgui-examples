@@ -23,12 +23,12 @@ Log::Log ()
     log_sinks.emplace_back (make_shared<sinks::stdout_color_sink_mt>());
     log_sinks.emplace_back (make_shared<sinks::basic_file_sink_mt> ("app.log", true));
 
-    log_sinks [0]->set_pattern ("%^[%T] %n(%l): %v%$");
+    log_sinks [0]->set_pattern ("[color] %^[%T] %n(%l): %v%$");
     log_sinks [1]->set_pattern ("[%T] [%l] %n(%l): %v");
 
 #ifdef _WIN32
     log_sinks.emplace_back (make_shared<sinks::msvc_sink_mt>());
-    log_sinks [2]->set_pattern ("%^[%T] %n(%l): %v%$");
+    log_sinks [2]->set_pattern ("[MSVC] %^[%T] %n(%l): %v%$");
 #endif
 
     m_logger = make_shared<spdlog::logger> ("APP", begin (log_sinks), end (log_sinks));
