@@ -34,12 +34,12 @@ namespace App
         SDL_Window* native () const;
         /* Polls and returns a vector of SDL events. */
         void pollEvents (std::vector<SDL_Event>& events) const;
-
+        /* Resizes the window based on the provided scale factor. */
         void resize (float scale);
     private:
         /** The native SDL window pointer. */
         SDL_Window* m_window;
-
+        /** The current scale factor applied to the window. */
         float m_scale;
     };
 }

@@ -39,7 +39,7 @@ namespace App
         void endFrame ();
         /** Fill the provided FrameContext with ImGui-related information for the current frame. */
         void fillFrameContext (FrameContext& ctx) const;
-
+        /** Rebuild ImGui fonts based on the provided scale factor, typically called when DPI scaling changes. */
         void rebuildFonts (float scale);
     private:
         /** Apply paths to ImGui configuration, such as loading fonts. */
