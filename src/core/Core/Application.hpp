@@ -66,7 +66,7 @@ namespace App
         /** The data model representing the state of the application. */
         DataModel m_model;
         /** The SDL event translator for processing SDL events and translating them into application events. */
-        SdlEventTranslator m_input;
+        SdlEventTranslator m_eventTranslator;
         /** The user interface for the application. */
         AppUi m_ui;
     };

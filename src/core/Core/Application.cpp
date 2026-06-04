@@ -44,7 +44,7 @@ ExitStatus Application::run ()
         FrameContext frameContext;
 
         m_window.pollEvents (events);
-        m_input.process (events, m_bus);
+        m_eventTranslator.process (events, m_bus);
 
         m_imgui.beginFrame (events);
         m_imgui.fillFrameContext (frameContext);
