@@ -1,4 +1,6 @@
 #pragma once
+#include "SdlWrapper.h"
+
 #include <SDL_events.h>
 
 #include <string>
@@ -29,7 +31,7 @@ namespace App
         void resize (float scale);
     private:
         /** The native SDL window pointer. */
-        SDL_Window* m_window;
+        sdl::SdlWindowPtr m_window;
         /** The current scale factor applied to the window. */
         float m_scale;
     };
