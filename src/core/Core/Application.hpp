@@ -4,9 +4,9 @@
 #include "EventBus.h"
 #include "ImGuiPass.h"
 #include "IPathService.h"
-#include "Renderer.h"
 #include "SdlEventTranslator.h"
-#include "Window.hpp"
+#include "SdlRenderer.h"
+#include "SdlWindow.h"
 
 #include <string>
 
@@ -58,9 +58,9 @@ namespace App
         /** Vector of subscriptions to application events, allowing for automatic unsubscription when the Application object is destroyed. */
         std::vector<EventBus::Subscription> m_subscriptions;
         /** The main application window. */
-        Window m_window;
+        SdlWindow m_window;
         /** The renderer for drawing to the window. */
-        Renderer m_renderer;
+        SdlRenderer m_renderer;
         /** The ImGui pass for rendering the UI. */
         ImGuiPass m_imgui;
         /** The data model representing the state of the application. */

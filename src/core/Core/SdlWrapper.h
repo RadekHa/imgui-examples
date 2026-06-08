@@ -53,6 +53,16 @@ namespace sdl
         }
     };
 
+    /** A deleter for SDL renderer. */
+    template<>
+    struct SdlDeleter<SDL_Renderer>
+    {
+        void operator() (SDL_Renderer* r) const noexcept
+        {
+            SDL_DestroyRenderer (r);
+        }
+    };
+
     /** Smart pointer type for SDL2 text. */
     using SdlTextPtr = SdlResource<char>;
     /** Smart pointer type for SDL2 surface. */
@@ -61,4 +71,6 @@ namespace sdl
     using SdlTexturePtr = SdlResource<SDL_Texture>;
     /** Smart pointer type for SDL2 window. */
     using SdlWindowPtr = SdlResource<SDL_Window>;
+    /** Smart pointer type for SDL2 renderer. */
+    using SdlRendererPtr = SdlResource<SDL_Renderer>;
 }
