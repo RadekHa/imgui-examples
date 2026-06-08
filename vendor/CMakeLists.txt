@@ -41,7 +41,8 @@ FetchContent_Declare(
 
 FetchContent_Declare(
     stb_image
-    URL "https://raw.githubusercontent.com/nothings/stb/master/stb_image.h"
+    URL "https://raw.githubusercontent.com/nothings/stb/013ac3beddff3dbffafd5177e7972067cd2b5083/stb_image.h"
+    URL_HASH SHA256=594c2fe35d49488b4382dbfaec8f98366defca819d916ac95becf3e75f4200b3
     DOWNLOAD_NO_EXTRACT TRUE
 )
 
