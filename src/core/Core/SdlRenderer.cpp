@@ -1,4 +1,5 @@
 #include "FrameContext.h"
+#include "Log.hpp"
 #include "SdlRenderer.h"
 
 #include <stdexcept>
@@ -10,14 +11,35 @@ using namespace std;
 SdlRenderer::SdlRenderer (SDL_Window* window)
     : m_renderer {}
 {
-    Uint32 flags = SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED;
-
-    m_renderer = SdlRendererPtr{
-        SDL_CreateRenderer (window, -1, flags)
+    if (!window)
+    {
+        throw runtime_error ("Window parameter cannot be null");
+    }
+    // Define a structured pair for configuration: [renderer flags, description for logging]
+    const pair<Uint32, string_view> rendererConfigs [] = {
+        {SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC, "Hardware Accelerated + VSync"},
+        {SDL_RENDERER_ACCELERATED, "Hardware Accelerated (No VSync)"},
+        {SDL_RENDERER_SOFTWARE, "Software Renderer (CPU Fallback)"}
     };
 
+    // Iterate through configurations and attempt to create the renderer
+    for (const auto& [flags, description] : rendererConfigs)
+    {
+        m_renderer = SdlRendererPtr{SDL_CreateRenderer (window, -1, flags)};
+
+        if (m_renderer)
+        {
+            APP_INFO ("Renderer successfully created using mode: {}", description);
+            break; // Found a working renderer, exit the loop
+        }
+        // Log a warning if the current mode failed, but only if we are not at the end of the chain
+        APP_WARN ("Renderer mode '{}' failed ({}). Trying next fallback...", description, SDL_GetError ());
+    }
+
+    // Final safety check to ensure at least the software renderer was initialized
     if (!m_renderer)
     {
+        APP_FATAL ("Fatal error: All available renderer modes failed to initialize: {}", SDL_GetError ());
         throw runtime_error (SDL_GetError ());
     }
 }
