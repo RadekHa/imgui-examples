@@ -7,26 +7,32 @@ using namespace std;
 
 
 Window::Window (const string& title)
-    : m_scale {dpi::getScale (0)}
+    : m_scale {1.0}
 {
     // TODO - use SdlWindowPtr
 
     const auto flags = static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
-    Window::Settings settings;
+    constexpr int width{1280};
+    constexpr int height{720};
 
     m_window = SDL_CreateWindow (
         title.c_str (),
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        static_cast<int> (settings.width * m_scale),
-        static_cast<int> (settings.height * m_scale),
+        width,
+        height,
         flags);
 
     if (!m_window)
     {
         throw runtime_error (SDL_GetError ());
     }
+    // Set the initial window size based on the DPI scale factor of the display.
+    const float scale = dpi::getScale (m_window);
+    resize (scale);
+
+    SDL_SetWindowPosition (m_window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
 Window::~Window ()

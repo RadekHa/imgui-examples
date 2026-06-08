@@ -13,18 +13,6 @@ namespace App
     class Window
     {
     public:
-
-        /** Struct representing the settings for creating a window. */
-        struct Settings
-        {
-            /** The title of the window. */
-            std::string title;
-            /** The width of the window in pixels. */
-            int width{1280};
-            /** The height of the window in pixels. */
-            int height{720};
-        };
-
         /** Initializes the window with a given title. */
         explicit Window (const std::string& title);
         /** Cleaning up resources. */
