@@ -1,13 +1,13 @@
 #include "DpiHandler.h"
 #include "Log.hpp"
-#include "Window.hpp"
+#include "SdlWindow.h"
 
 using namespace App;
 using namespace sdl;
 using namespace std;
 
 
-Window::Window (const string& title)
+SdlWindow::SdlWindow (const string& title)
     : m_scale {1.0}
 {
     const auto flags = static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
@@ -36,19 +36,19 @@ Window::Window (const string& title)
     SDL_SetWindowPosition (m_window.get (), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
-Window::~Window () = default;
+SdlWindow::~SdlWindow () = default;
 
-int Window::getWindowDisplayIndex () const
+int SdlWindow::getWindowDisplayIndex () const
 {
     return SDL_GetWindowDisplayIndex (m_window.get ());
 }
 
-SDL_Window* Window::native () const
+SDL_Window* SdlWindow::native () const
 {
     return m_window.get ();
 }
 
-void Window::pollEvents (vector<SDL_Event>& events) const
+void SdlWindow::pollEvents (vector<SDL_Event>& events) const
 {
     events.clear ();
 
@@ -60,7 +60,7 @@ void Window::pollEvents (vector<SDL_Event>& events) const
     }
 }
 
-void Window::resize (float scale)
+void SdlWindow::resize (float scale)
 {
     if (scale <= 0.0f)
     {

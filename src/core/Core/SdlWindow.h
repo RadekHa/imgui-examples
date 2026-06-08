@@ -1,8 +1,6 @@
 #pragma once
 #include "SdlWrapper.h"
 
-#include <SDL_events.h>
-
 #include <string>
 #include <vector>
 
@@ -12,22 +10,22 @@ typedef struct SDL_Window SDL_Window;
 namespace App
 {
     /** Class representing the application window. */
-    class Window
+    class SdlWindow
     {
     public:
         /** Initializes the window with a given title. */
-        explicit Window (const std::string& title);
+        explicit SdlWindow (const std::string& title);
         /** Cleaning up resources. */
-        ~Window ();
+        ~SdlWindow ();
 
         /** The copy constructor is deleted. */
-        Window (const Window&) = delete;
+        SdlWindow (const SdlWindow&) = delete;
         /** The copy assignment operator is deleted. */
-        Window& operator= (const Window&) = delete;
-        /** The move constructor is defaulted to allow moving of the Window instance. */
-        Window (Window&&) noexcept = default;
-        /** The move assignment operator is defaulted to allow moving of the Window instance. */
-        Window& operator= (Window&&) noexcept = default;
+        SdlWindow& operator= (const SdlWindow&) = delete;
+        /** The move constructor is defaulted to allow moving of the SdlWindow instance. */
+        SdlWindow (SdlWindow&&) noexcept = default;
+        /** The move assignment operator is defaulted to allow moving of the SdlWindow instance. */
+        SdlWindow& operator= (SdlWindow&&) noexcept = default;
 
         /** Get the display index of the window. */
         int getWindowDisplayIndex () const;
@@ -39,7 +37,7 @@ namespace App
         /* Resizes the window based on the provided scale factor. */
         void resize (float scale);
     private:
-        /** The native SDL window pointer. */
+        /** The native SDL window pointer wrapped in a smart pointer for automatic resource management. */
         sdl::SdlWindowPtr m_window;
         /** The current scale factor applied to the window. */
         float m_scale;

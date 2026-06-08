@@ -1,9 +1,5 @@
 #pragma once
-
-/** Forward class declaration of SDL window. */
-typedef struct SDL_Window SDL_Window;
-/** Forward class declaration of SDL renderer. */
-struct SDL_Renderer;
+#include "SdlWrapper.h"
 
 namespace App
 {
@@ -11,13 +7,13 @@ namespace App
     struct FrameContext;
 
     /* Class responsible for managing the SDL renderer and handling rendering operations. */
-    class Renderer
+    class SdlRenderer
     {
     public:
         /* Initializes the renderer with a given SDL window. */
-        explicit Renderer (SDL_Window* window);
+        explicit SdlRenderer (SDL_Window* window);
         /* Cleaning up resources. */
-        ~Renderer ();
+        ~SdlRenderer ();
 
         /** Begins a new frame for rendering. */
         void beginFrame (const FrameContext& ctx);
@@ -27,7 +23,7 @@ namespace App
         SDL_Renderer* native () const;
 
     private:
-        /* The native SDL renderer pointer. */
-        SDL_Renderer* m_renderer;
+        /* The native SDL renderer pointer wrapped in a smart pointer for automatic resource management. */
+        sdl::SdlRendererPtr m_renderer;
     };
 }

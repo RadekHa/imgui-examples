@@ -7,20 +7,20 @@ add_library(${NAME} STATIC
   "Core/Application.cpp"
   "Core/Application.hpp"
   "Core/AppUi.cpp"
+  "Core/DpiHandler.cpp"
+  "Core/DpiHandler.h"
   "Core/EventBus.h"
   "Core/EventBusImpl.h"
   "Core/ImGuiPass.cpp"
-  "Core/SdlEventTranslator.cpp"
   "Core/Log.cpp"
   "Core/Log.hpp"
-  "Core/Renderer.cpp"
   "Core/SdlContext.cpp"
   "Core/SdlContext.h"
+  "Core/SdlEventTranslator.cpp"
   "Core/SdlPathService.cpp"
-  "Core/Window.cpp"
-  "Core/Window.hpp"
-  "Core/DpiHandler.h"
-  "Core/DpiHandler.cpp")
+  "Core/SdlRenderer.cpp"
+  "Core/SdlWindow.cpp"
+)
 
 target_include_directories(${NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(${NAME} PRIVATE cxx_std_20)
