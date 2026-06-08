@@ -7,8 +7,10 @@ using namespace std;
 
 
 Window::Window (const string& title)
-    : m_scale {DpiHandler::getScale (0)}
+    : m_scale {dpi::getScale (0)}
 {
+    // TODO - use SdlWindowPtr
+
     const auto flags = static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     Window::Settings settings;
@@ -30,6 +32,11 @@ Window::Window (const string& title)
 Window::~Window ()
 {
     SDL_DestroyWindow (m_window);
+}
+
+int Window::getWindowDisplayIndex () const
+{
+    return SDL_GetWindowDisplayIndex (m_window);
 }
 
 SDL_Window* Window::native () const

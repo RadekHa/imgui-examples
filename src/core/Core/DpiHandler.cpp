@@ -3,9 +3,7 @@
 
 #include <SDL2/SDL.h>
 
-using namespace App;
-
-float DpiHandler::getScale (int32_t displayIndex)
+float App::dpi::getScale (int32_t displayIndex)
 {
     constexpr float default_dpi{96.0f};
     float dpi{default_dpi};
@@ -18,7 +16,7 @@ float DpiHandler::getScale (int32_t displayIndex)
     return dpi / default_dpi;
 }
 
-float DpiHandler::getScale (SDL_Window* window)
+float App::dpi::getScale (SDL_Window* window)
 {
     int displayIndex = SDL_GetWindowDisplayIndex (window);
     return getScale (displayIndex);

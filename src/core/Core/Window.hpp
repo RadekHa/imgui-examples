@@ -30,6 +30,9 @@ namespace App
         /** Cleaning up resources. */
         ~Window ();
 
+        /** Get the display index of the window. */
+        int getWindowDisplayIndex () const;
+
         /** Returns the native SDL window pointer. */
         SDL_Window* native () const;
         /* Polls and returns a vector of SDL events. */

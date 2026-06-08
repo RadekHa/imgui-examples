@@ -83,7 +83,7 @@ void Application::init ()
     m_subscriptions.emplace_back (m_bus.subscribe<EventDisplayChanged> ( [this] (const auto& e) {
         APP_INFO ("Display changed: {}", e.displayIndex);
 
-        float scale = DpiHandler::getScale (e.displayIndex);
+        float scale = dpi::getScale (e.displayIndex);
         m_window.resize (scale);
         m_imgui.rebuildFonts (scale);
     }));

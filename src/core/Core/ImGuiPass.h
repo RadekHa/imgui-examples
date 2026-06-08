@@ -53,5 +53,7 @@ namespace App
         SDL_Renderer* m_renderer;
         /** Pointer to the IPathService for accessing resource paths. */
         const IPathService* m_paths;
+        /** The current scale factor applied to imgui. */
+        float m_scale;
     };
 }

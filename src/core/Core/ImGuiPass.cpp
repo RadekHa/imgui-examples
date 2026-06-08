@@ -15,6 +15,7 @@ using namespace std;
 ImGuiPass::ImGuiPass (SDL_Window* window, SDL_Renderer* renderer, const IPathService* paths)
     : m_renderer {renderer}
     , m_paths {paths}
+    , m_scale {1.0f}
 {
     if ((window == nullptr) || (renderer == nullptr) || (paths == nullptr))
     {
@@ -31,7 +32,7 @@ ImGuiPass::ImGuiPass (SDL_Window* window, SDL_Renderer* renderer, const IPathSer
         ImGuiConfigFlags_DockingEnable |
         ImGuiConfigFlags_ViewportsEnable;
 
-    float scale = DpiHandler::getScale (window);
+    float scale = dpi::getScale (window);
     applyPaths (scale);
 
     if (!ImGui_ImplSDL2_InitForSDLRenderer (window, renderer))
@@ -87,25 +88,25 @@ void ImGuiPass::fillFrameContext (FrameContext& ctx) const
 
 void ImGuiPass::rebuildFonts (float scale)
 {
-    ImGuiIO& io = ImGui::GetIO ();
+    if (m_scale != scale)
+    {
+        ImGuiIO& io = ImGui::GetIO ();
 
-    ImGui_ImplSDLRenderer2_DestroyDeviceObjects ();
+        ImGui_ImplSDLRenderer2_DestroyDeviceObjects ();
 
-    io.Fonts->Clear ();
-    io.FontDefault = nullptr;
-    applyPaths (scale);
-    io.Fonts->Build ();
+        io.Fonts->Clear ();
+        io.FontDefault = nullptr;
+        applyPaths (scale);
+        io.Fonts->Build ();
 
-    ImGui_ImplSDLRenderer2_CreateDeviceObjects ();
-
-    // Reset style to default and apply scaling.
-    ImGuiStyle& style = ImGui::GetStyle ();
-    style = ImGuiStyle ();
-    style.ScaleAllSizes (scale);
+        ImGui_ImplSDLRenderer2_CreateDeviceObjects ();
+    }
 }
 
 void ImGuiPass::applyPaths (float scale)
 {
+    m_scale = scale;
+
     ImGuiIO& io = ImGui::GetIO ();
 
     constexpr float baseFontSize = 18.0f;
@@ -125,4 +126,8 @@ void ImGuiPass::applyPaths (float scale)
     {
         APP_WARN ("Failed to load font from path: {}", fontFile.c_str ());
     }
+    // Reset style to default and apply scaling.
+    ImGuiStyle& style = ImGui::GetStyle ();
+    style = ImGuiStyle ();
+    style.ScaleAllSizes (scale);
 }
