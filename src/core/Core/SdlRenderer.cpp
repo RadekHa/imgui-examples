@@ -33,7 +33,7 @@ SdlRenderer::SdlRenderer (SDL_Window* window)
             break; // Found a working renderer, exit the loop
         }
         // Log a warning if the current mode failed, but only if we are not at the end of the chain
-        APP_WARN ("Renderer mode '{}' failed ({}). Trying next fallback...", description, SDL_GetError ());
+        APP_WARN ("Renderer mode '{}' failed ({}).", description, SDL_GetError ());
     }
 
     // Final safety check to ensure at least the software renderer was initialized
