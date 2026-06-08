@@ -39,6 +39,12 @@ FetchContent_Declare(
 #  GIT_TAG v0.13.2
 )
 
+FetchContent_Declare(
+    stb_image
+    URL "https://raw.githubusercontent.com/nothings/stb/master/stb_image.h"
+    DOWNLOAD_NO_EXTRACT TRUE
+)
+
 # Settings
 
 # For SDL2 to be able to override options
@@ -49,7 +55,8 @@ set(SDL2_DISABLE_SDL2MAIN ON)
 set(SPDLOG_FMT_EXTERNAL ON)
 
 add_subdirectory(imgui-setup)
+add_subdirectory(stb-setup)
 
 # Populate
 
-FetchContent_MakeAvailable(Catch2 fmt imgui SDL2 spdlog tracy)
+FetchContent_MakeAvailable(Catch2 fmt SDL2 spdlog tracy)
