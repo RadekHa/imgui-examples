@@ -19,5 +19,11 @@ float App::dpi::getScale (int32_t displayIndex)
 float App::dpi::getScale (SDL_Window* window)
 {
     int displayIndex = SDL_GetWindowDisplayIndex (window);
+
+    if (displayIndex < 0)
+    {
+        APP_WARN ("SDL_GetWindowDisplayIndex failed: {}", SDL_GetError ());
+        return 1.0f;
+    }
     return getScale (displayIndex);
 }
