@@ -1,4 +1,6 @@
 #pragma once
+#include "SdlWrapper.h"
+
 #include <SDL_events.h>
 
 #include <string>
@@ -18,6 +20,15 @@ namespace App
         /** Cleaning up resources. */
         ~Window ();
 
+        /** The copy constructor is deleted. */
+        Window (const Window&) = delete;
+        /** The copy assignment operator is deleted. */
+        Window& operator= (const Window&) = delete;
+        /** The move constructor is defaulted to allow moving of the Window instance. */
+        Window (Window&&) noexcept = default;
+        /** The move assignment operator is defaulted to allow moving of the Window instance. */
+        Window& operator= (Window&&) noexcept = default;
+
         /** Get the display index of the window. */
         int getWindowDisplayIndex () const;
 
@@ -29,7 +40,7 @@ namespace App
         void resize (float scale);
     private:
         /** The native SDL window pointer. */
-        SDL_Window* m_window;
+        sdl::SdlWindowPtr m_window;
         /** The current scale factor applied to the window. */
         float m_scale;
     };
