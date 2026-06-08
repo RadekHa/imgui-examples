@@ -64,6 +64,12 @@ void Window::pollEvents (vector<SDL_Event>& events) const
 
 void Window::resize (float scale)
 {
+    if (scale <= 0.0f)
+    {
+        APP_WARN ("Invalid scale: {}", scale);
+        return;
+    }
+
     if (m_scale != scale)
     {
         int width, height;

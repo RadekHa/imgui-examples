@@ -13,6 +13,11 @@ float App::dpi::getScale (int32_t displayIndex)
         APP_WARN ("SDL_GetDisplayDPI failed: {}", SDL_GetError ());
         return 1.0f;
     }
+
+    if (dpi <= 0.0f)
+    {
+        return 1.0f;
+    }
     return dpi / default_dpi;
 }
 
