@@ -1,8 +1,12 @@
 #pragma once
 #include "IPathService.h"
 
+#include <vector>
+
 /** Forward class declaration of SDL window. */
 typedef struct SDL_Window SDL_Window;
+/** Forward class declaration of SDL event. */
+typedef union SDL_Event SDL_Event;
 /** Forward class declaration of SDL renderer. */
 struct SDL_Renderer;
 /** Forward class declaration of ImGuiIO structure. */
@@ -34,17 +38,22 @@ namespace App
         ImGuiPass& operator= (ImGuiPass&&) = delete;
 
         /** Start a new ImGui frame. */
-        void beginFrame ();
+        void beginFrame (const std::vector<SDL_Event>& events);
         /** End the current ImGui frame and render the draw data. */
         void endFrame ();
         /** Fill the provided FrameContext with ImGui-related information for the current frame. */
         void fillFrameContext (FrameContext& ctx) const;
-
+        /** Rebuild ImGui fonts based on the provided scale factor, typically called when DPI scaling changes. */
+        void rebuildFonts (float scale);
     private:
-        /** Apply paths from the IPathService to ImGui configuration, such as loading fonts. */
-        void applyPaths (const IPathService* paths);
+        /** Apply paths to ImGui configuration, such as loading fonts. */
+        void applyPaths (float scale);
 
         /** Pointer to the SDL renderer used for rendering ImGui draw data. */
         SDL_Renderer* m_renderer;
+        /** Pointer to the IPathService for accessing resource paths. */
+        const IPathService* m_paths;
+        /** The current scale factor applied to imgui. */
+        float m_scale;
     };
 }

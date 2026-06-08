@@ -7,7 +7,7 @@
 using namespace App;
 using namespace std;
 
-SDLContext::SDLContext ()
+SdlContext::SdlContext ()
 {
     SDL_SetHint (SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
 
@@ -17,7 +17,7 @@ SDLContext::SDLContext ()
     }
 }
 
-SDLContext::~SDLContext ()
+SdlContext::~SdlContext ()
 {
     SDL_Quit ();
 }

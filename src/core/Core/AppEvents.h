@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 namespace App
 {
@@ -12,4 +13,10 @@ namespace App
     struct EventShown {};
     /** Event representing a restored request. */
     struct EventRestored {};
+    /** Event representing a display change request. */
+    struct EventDisplayChanged
+    {
+        /** The index of the new display. */
+        int32_t displayIndex;
+    };
 }

@@ -12,7 +12,8 @@ namespace App
         EventClose,
         EventMinimized,
         EventShown,
-        EventRestored
+        EventRestored,
+        EventDisplayChanged
         >;
 
     /** Type alias for the event bus used in the application, based on the defined events. */

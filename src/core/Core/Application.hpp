@@ -3,9 +3,9 @@
 #include "DataModel.h"
 #include "EventBus.h"
 #include "ImGuiPass.h"
-#include "InputSystem.h"
 #include "IPathService.h"
 #include "Renderer.h"
+#include "SdlEventTranslator.h"
 #include "Window.hpp"
 
 #include <string>
@@ -50,23 +50,23 @@ namespace App
         ExitStatus m_exitStatus;
         /** Flag indicating whether the main application loop is running. */
         bool m_isRunning;
-        /* Flag indicating whether the application window is currently minimized. */
+        /** Flag indicating whether the application window is currently minimized. */
         bool m_isMinimized;
 
-        /* The event bus for handling application events. */
+        /** The event bus for handling application events. */
         EventBus m_bus;
-        /* Vector of subscriptions to application events, allowing for automatic unsubscription when the Application object is destroyed. */
+        /** Vector of subscriptions to application events, allowing for automatic unsubscription when the Application object is destroyed. */
         std::vector<EventBus::Subscription> m_subscriptions;
-        /* The main application window. */
+        /** The main application window. */
         Window m_window;
-        /* The renderer for drawing to the window. */
+        /** The renderer for drawing to the window. */
         Renderer m_renderer;
-        /* The ImGui pass for rendering the UI. */
+        /** The ImGui pass for rendering the UI. */
         ImGuiPass m_imgui;
-        /* The data model representing the state of the application. */
+        /** The data model representing the state of the application. */
         DataModel m_model;
-        /* The input system for processing user input. */
-        InputSystem m_input;
+        /** The SDL event translator for processing SDL events and translating them into application events. */
+        SdlEventTranslator m_eventTranslator;
         /** The user interface for the application. */
         AppUi m_ui;
     };

@@ -1,38 +1,48 @@
-#include "Core/DPIHandler.hpp"
-#include "Core/Log.hpp"
+#include "DpiHandler.h"
+#include "Log.hpp"
 #include "Window.hpp"
-
-#include <SDL2/SDL.h>
 
 using namespace App;
 using namespace std;
 
 
 Window::Window (const string& title)
-    : m_context {new SDLContext}
+    : m_scale {1.0}
 {
+    // TODO - use SdlWindowPtr
+
     const auto flags = static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
-    Window::Settings settings;
-    const WindowSize size{DPIHandler::get_dpi_aware_window_size (settings)};
+    constexpr int width{1280};
+    constexpr int height{720};
 
     m_window = SDL_CreateWindow (
         title.c_str (),
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        size.width,
-        size.height,
+        width,
+        height,
         flags);
 
     if (!m_window)
     {
         throw runtime_error (SDL_GetError ());
     }
+    // Set the initial window size based on the DPI scale factor of the display.
+    const float scale = dpi::getScale (m_window);
+    resize (scale);
+
+    SDL_SetWindowPosition (m_window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
 Window::~Window ()
 {
     SDL_DestroyWindow (m_window);
+}
+
+int Window::getWindowDisplayIndex () const
+{
+    return SDL_GetWindowDisplayIndex (m_window);
 }
 
 SDL_Window* Window::native () const
@@ -49,5 +59,29 @@ void Window::pollEvents (vector<SDL_Event>& events) const
     while (SDL_PollEvent (&e))
     {
         events.push_back (e);
+    }
+}
+
+void Window::resize (float scale)
+{
+    if (scale <= 0.0f)
+    {
+        APP_WARN ("Invalid scale: {}", scale);
+        return;
+    }
+
+    if (m_scale != scale)
+    {
+        int width, height;
+        SDL_GetWindowSize (m_window, &width, &height);
+
+        int newWidth = static_cast<int> (width * (scale / m_scale));
+        int newHeight = static_cast<int> (height * (scale / m_scale));
+
+        APP_INFO ("Scale update: {} -> {}. Resizing window to {}x{}",
+                  m_scale, scale, newWidth, newHeight);
+
+        m_scale = scale;
+        SDL_SetWindowSize (m_window, newWidth, newHeight);
     }
 }

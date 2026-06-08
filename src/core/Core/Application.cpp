@@ -1,4 +1,5 @@
 #include "Application.hpp"
+#include "DpiHandler.h"
 #include "FrameContext.h"
 #include "Log.hpp"
 #include "Window.hpp"
@@ -43,9 +44,9 @@ ExitStatus Application::run ()
         FrameContext frameContext;
 
         m_window.pollEvents (events);
-        m_input.process (events, m_bus);
+        m_eventTranslator.process (events, m_bus);
 
-        m_imgui.beginFrame ();
+        m_imgui.beginFrame (events);
         m_imgui.fillFrameContext (frameContext);
 
         m_renderer.beginFrame (frameContext);
@@ -77,5 +78,13 @@ void Application::init ()
     }));
     m_subscriptions.emplace_back (m_bus.subscribe<EventRestored> ( [this] (const auto&) {
         m_isMinimized = false;
+    }));
+
+    m_subscriptions.emplace_back (m_bus.subscribe<EventDisplayChanged> ( [this] (const auto& e) {
+        APP_INFO ("Display changed: {}", e.displayIndex);
+
+        float scale = dpi::getScale (e.displayIndex);
+        m_window.resize (scale);
+        m_imgui.rebuildFonts (scale);
     }));
 }
