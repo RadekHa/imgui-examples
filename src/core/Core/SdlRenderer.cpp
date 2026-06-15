@@ -1,6 +1,7 @@
 #include "FrameContext.h"
 #include "Log.hpp"
 #include "SdlRenderer.h"
+#include "SdlUtils.h"
 
 #include <stdexcept>
 
@@ -8,7 +9,7 @@ using namespace App;
 using namespace sdl;
 using namespace std;
 
-SdlRenderer::SdlRenderer (SDL_Window* window)
+SdlRenderer::SdlRenderer (SDL_Window* window, const IPathService* paths)
     : m_renderer {}
 {
     if (!window)
@@ -42,6 +43,8 @@ SdlRenderer::SdlRenderer (SDL_Window* window)
         APP_FATAL ("Fatal error: All available renderer modes failed to initialize: {}", SDL_GetError ());
         throw runtime_error (SDL_GetError ());
     }
+    // Load texture.
+    m_background = LoadTexture (m_renderer.get (), paths->getResourcePath ("images/image.png").c_str ());
 }
 
 SdlRenderer::~SdlRenderer () = default;
@@ -61,4 +64,17 @@ void SdlRenderer::endFrame ()
 SDL_Renderer* SdlRenderer::native () const
 {
     return m_renderer.get ();
+}
+
+void SdlRenderer::update (DataModel& model)
+{
+    int textureWidth = 0;
+    int textureHeight = 0;
+
+    SDL_QueryTexture (m_background.get (), nullptr, nullptr, &textureWidth, &textureHeight);
+
+    SDL_Rect destinationRect{.x = 50, .y = 50, .w = textureWidth, .h = textureHeight};
+
+    SDL_RenderCopy (m_renderer.get (), m_background.get (), nullptr, nullptr);
+    SDL_RenderCopy (m_renderer.get (), m_background.get (), nullptr, &destinationRect);
 }

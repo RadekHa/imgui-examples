@@ -1,4 +1,6 @@
 #pragma once
+#include "DataModel.h"
+#include "IPathService.h"
 #include "SdlWrapper.h"
 
 namespace App
@@ -11,7 +13,7 @@ namespace App
     {
     public:
         /* Initializes the renderer with a given SDL window. */
-        explicit SdlRenderer (SDL_Window* window);
+        SdlRenderer (SDL_Window* window, const IPathService* paths);
         /* Cleaning up resources. */
         ~SdlRenderer ();
 
@@ -21,9 +23,13 @@ namespace App
         void endFrame ();
         /** Returns the native SDL renderer pointer. */
         SDL_Renderer* native () const;
+        /** Draw background images to renderer. */
+        void update (DataModel& model);
 
     private:
-        /* The native SDL renderer pointer wrapped in a smart pointer for automatic resource management. */
+        /** The native SDL renderer pointer wrapped in a smart pointer for automatic resource management. */
         sdl::SdlRendererPtr m_renderer;
+        /** Texture with image to draw. */
+        sdl::SdlTexturePtr m_background;
     };
 }

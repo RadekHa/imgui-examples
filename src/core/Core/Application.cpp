@@ -13,7 +13,7 @@ Application::Application (const string& title, const IPathService* paths)
     , m_isRunning {true}
     , m_isMinimized {}
     , m_window (title)
-    , m_renderer (m_window.native ())
+    , m_renderer (m_window.native (), paths)
     , m_imgui (m_window.native (), m_renderer.native (), paths)
 {
     ZoneScoped;
@@ -53,6 +53,7 @@ ExitStatus Application::run ()
         if (!m_isMinimized)
         {
             m_ui.update (m_model);
+            m_renderer.update (m_model);
         }
         m_imgui.endFrame ();
         m_renderer.endFrame ();
