@@ -46,6 +46,13 @@ FetchContent_Declare(
     DOWNLOAD_NO_EXTRACT TRUE
 )
 
+FetchContent_Declare(
+    opencv
+    GIT_REPOSITORY https://github.com/opencv/opencv.git
+    GIT_TAG        5.0.0
+    GIT_SHALLOW    TRUE
+)
+
 # Settings
 
 # For SDL2 to be able to override options
@@ -57,6 +64,7 @@ set(SPDLOG_FMT_EXTERNAL ON)
 
 add_subdirectory(imgui-setup)
 add_subdirectory(stb-setup)
+add_subdirectory(opencv-setup)
 
 # Populate
 
