@@ -1,7 +1,7 @@
 #include "FrameContext.h"
-#include "Log.hpp"
 #include "SdlRenderer.h"
 #include "SdlUtils.h"
+#include "TraceLog/Log.hpp"
 
 #include <stdexcept>
 
@@ -66,7 +66,7 @@ SDL_Renderer* SdlRenderer::native () const
     return m_renderer.get ();
 }
 
-void SdlRenderer::update (DataModel& model)
+void SdlRenderer::update (DataModel& /*model*/)
 {
     if (m_background)
     {

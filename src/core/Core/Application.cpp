@@ -1,9 +1,8 @@
 #include "Application.hpp"
 #include "DpiHandler.h"
 #include "FrameContext.h"
-#include "Log.hpp"
-
-#include <tracy/Tracy.hpp>
+#include "TraceLog/Log.hpp"
+#include "TraceLog/Tracy.hpp"
 
 using namespace App;
 using namespace std;

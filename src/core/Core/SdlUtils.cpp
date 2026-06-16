@@ -1,5 +1,5 @@
-#include "Log.hpp"
 #include "SdlUtils.h"
+#include "TraceLog/Log.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
