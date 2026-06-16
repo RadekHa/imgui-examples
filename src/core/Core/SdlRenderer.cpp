@@ -68,13 +68,16 @@ SDL_Renderer* SdlRenderer::native () const
 
 void SdlRenderer::update (DataModel& model)
 {
-    int textureWidth = 0;
-    int textureHeight = 0;
+    if (m_background)
+    {
+        int textureWidth = 0;
+        int textureHeight = 0;
 
-    SDL_QueryTexture (m_background.get (), nullptr, nullptr, &textureWidth, &textureHeight);
+        SDL_QueryTexture (m_background.get (), nullptr, nullptr, &textureWidth, &textureHeight);
 
-    SDL_Rect destinationRect{.x = 50, .y = 50, .w = textureWidth, .h = textureHeight};
+        SDL_Rect destinationRect{.x = 50, .y = 50, .w = textureWidth, .h = textureHeight};
 
-    SDL_RenderCopy (m_renderer.get (), m_background.get (), nullptr, nullptr);
-    SDL_RenderCopy (m_renderer.get (), m_background.get (), nullptr, &destinationRect);
+        SDL_RenderCopy (m_renderer.get (), m_background.get (), nullptr, nullptr);
+        SDL_RenderCopy (m_renderer.get (), m_background.get (), nullptr, &destinationRect);
+    }
 }

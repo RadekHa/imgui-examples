@@ -9,6 +9,7 @@ using namespace sdl;
 
 namespace details
 {
+    /** A deleter for stb image. */
     struct StbImageDeleter
     {
         void operator() (unsigned char* ptr) const
@@ -20,48 +21,66 @@ namespace details
         }
     };
 
+    /** RAII smart pointer for stb image. */
     using StbImagePtr = unique_ptr<unsigned char, StbImageDeleter>;
 }
 
 
 SdlTexturePtr App::LoadTexture (SDL_Renderer* renderer, const char* filePath)
 {
+    SdlTexturePtr texture;
     int width = 0;
     int height = 0;
     int bytesPerPixel = 0;
 
+    // Check parameters.
+    if (!renderer)
+    {
+        APP_ERROR ("LoadTexture: renderer parameter cannot be null");
+        return nullptr;
+    }
+
+    if (!filePath)
+    {
+        APP_ERROR ("LoadTexture: filePath parameter cannot be null");
+        return nullptr;
+    }
+    // Load pixels.
     auto rawPixels = details::StbImagePtr{stbi_load (filePath, &width, &height, &bytesPerPixel, STBI_rgb_alpha)};
 
     if (!rawPixels)
     {
-        SDL_LogError (SDL_LOG_CATEGORY_APPLICATION,
-                      "STB Image failed to load '%s': %s",
-                      filePath,
-                      stbi_failure_reason ());
+        APP_ERROR ("STB Image failed to load '{}': {}", filePath, stbi_failure_reason ());
         return nullptr;
     }
-    SDL_LogInfo (SDL_LOG_CATEGORY_APPLICATION, "Loaded image '%s' (%dx%d, original channels: %d)",
-                 filePath, width, height, bytesPerPixel);
+    APP_INFO ("Loaded image '{}' ({}x{}, original channels: {})", filePath, width, height, bytesPerPixel);
 
-    SDL_Texture* texture = SDL_CreateTexture (
-        renderer,
-        SDL_PIXELFORMAT_RGBA32,
-        SDL_TEXTUREACCESS_STATIC,
-        width,
-        height
-        );
+    texture = SdlTexturePtr{
+        SDL_CreateTexture (
+            renderer,
+            SDL_PIXELFORMAT_RGBA32,
+            SDL_TEXTUREACCESS_STATIC,
+            width,
+            height
+            )
+    };
 
-    if (texture == nullptr)
+    if (!texture)
     {
-        SDL_LogError (SDL_LOG_CATEGORY_RENDER, "Failed to create texture from '%s': %s",
-                      filePath, SDL_GetError ());
-
+        APP_ERROR ("Failed to create texture from '{}': {}", filePath, SDL_GetError ());
         return nullptr;
     }
     int pitch = width * 4;
-    SDL_UpdateTexture (texture, nullptr, rawPixels.get (), pitch);
 
-    SDL_SetTextureBlendMode (texture, SDL_BLENDMODE_BLEND);
+    if (SDL_UpdateTexture (texture.get (), nullptr, rawPixels.get (), pitch) < 0)
+    {
+        APP_ERROR ("Failed to update texture from '{}': {}", filePath, SDL_GetError ());
+        return nullptr;
+    }
 
-    return SdlTexturePtr{texture};
+    if (SDL_SetTextureBlendMode (texture.get (), SDL_BLENDMODE_BLEND) < 0)
+    {
+        APP_WARN ("Failed to set blend mode for '{}': {}", filePath, SDL_GetError ());
+    }
+    return texture;
 }
