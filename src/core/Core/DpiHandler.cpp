@@ -1,5 +1,5 @@
 #include "DpiHandler.h"
-#include "Log.hpp"
+#include "TraceLog/Log.hpp"
 
 #include <SDL2/SDL.h>
 

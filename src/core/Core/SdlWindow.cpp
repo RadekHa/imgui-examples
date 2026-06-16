@@ -1,6 +1,6 @@
 #include "DpiHandler.h"
-#include "Log.hpp"
 #include "SdlWindow.h"
+#include "TraceLog/Log.hpp"
 
 using namespace App;
 using namespace sdl;

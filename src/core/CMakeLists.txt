@@ -12,8 +12,6 @@ add_library(${NAME} STATIC
   "Core/EventBus.h"
   "Core/EventBusImpl.h"
   "Core/ImGuiPass.cpp"
-  "Core/Log.cpp"
-  "Core/Log.hpp"
   "Core/SdlContext.cpp"
   "Core/SdlContext.h"
   "Core/SdlEventTranslator.cpp"
@@ -28,8 +26,8 @@ target_include_directories(${NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(${NAME} PRIVATE cxx_std_20)
 
 target_link_libraries(${NAME}
-  PRIVATE project_warnings Tracy::TracyClient
-  PUBLIC fmt spdlog SDL2::SDL2 imgui Settings stb::image)
+  PRIVATE project_warnings
+  PUBLIC TraceLog SDL2::SDL2 imgui Settings stb::image)
 
 
 add_subdirectory(Tests)
