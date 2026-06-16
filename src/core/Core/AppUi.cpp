@@ -8,7 +8,9 @@ using namespace App;
 
 void AppUi::update (DataModel& model)
 {
-    ImGui::DockSpaceOverViewport ();
+    ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
+
+    ImGui::DockSpaceOverViewport (0, ImGui::GetMainViewport (), dockspaceFlags);
 
     if (ImGui::BeginMainMenuBar ())
     {
