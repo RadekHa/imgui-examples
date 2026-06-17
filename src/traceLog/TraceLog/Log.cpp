@@ -10,9 +10,9 @@
 #include <memory>
 #include <vector>
 
-using namespace App;
 using namespace std;
 using namespace spdlog;
+using namespace TraceLog;
 
 Log::Log ()
 {
