@@ -38,7 +38,7 @@ namespace App
         void resize (float scale);
     private:
         /** The native SDL window pointer wrapped in a smart pointer for automatic resource management. */
-        sdl::SdlWindowPtr m_window;
+        Sdl::SdlWindowPtr m_window;
         /** The current scale factor applied to the window. */
         float m_scale;
     };

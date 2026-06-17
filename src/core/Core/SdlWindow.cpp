@@ -3,7 +3,7 @@
 #include "TraceLog/Log.hpp"
 
 using namespace App;
-using namespace sdl;
+using namespace Sdl;
 using namespace std;
 
 

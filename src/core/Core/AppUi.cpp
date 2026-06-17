@@ -1,12 +1,14 @@
 #include "AppUi.h"
+#include "SdlCameraTexture.h"
 
 #include "imgui.h"
 
 #include <stdio.h>
 
 using namespace App;
+using namespace Sdl;
 
-void AppUi::update (DataModel& model)
+void AppUi::update (DataModel& model, const SdlCameraTexture* camera)
 {
     ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
 
@@ -32,6 +34,13 @@ void AppUi::update (DataModel& model)
     {
         drawFpsGraph ();
     }
+    ImGui::Begin ("Camera");
+
+    if (camera->isValid ())
+    {
+        ImGui::Image (camera->getImguiTextureId (), ImVec2 (float (camera->getWidth ()), float (camera->getHeight ())));
+    }
+    ImGui::End ();
 }
 
 void AppUi::drawFpsGraph ()

@@ -28,8 +28,8 @@ namespace App
 
     private:
         /** The native SDL renderer pointer wrapped in a smart pointer for automatic resource management. */
-        sdl::SdlRendererPtr m_renderer;
+        Sdl::SdlRendererPtr m_renderer;
         /** Texture with image to draw. */
-        sdl::SdlTexturePtr m_background;
+        Sdl::SdlTexturePtr m_background;
     };
 }
