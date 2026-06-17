@@ -1,5 +1,5 @@
 
-set(BUILD_LIST "core,imgproc,highgui" CACHE STRING "" FORCE)
+set(BUILD_LIST "core,imgproc,videoio" CACHE STRING "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(BUILD_PERF_TESTS OFF CACHE BOOL "" FORCE)
@@ -9,21 +9,21 @@ set(WITH_FFMPEG OFF CACHE BOOL "" FORCE)
 set(WITH_IPP OFF CACHE BOOL "" FORCE)
 set(BUILD_WITH_STATIC_CRT OFF CACHE BOOL "" FORCE)
 
-FetchContent_GetProperties(opencv)
+FetchContent_MakeAvailable(opencv)
 
-if(NOT opencv_POPULATED)
-    message(STATUS "[OpenCV] Downloading and configuring (this may take a while)...")
-    FetchContent_Populate(opencv)
-    message(STATUS "[OpenCV] Source dir: ${opencv_SOURCE_DIR}")
-    message(STATUS "[OpenCV] Binary dir: ${opencv_BINARY_DIR}")
-    add_subdirectory(${opencv_SOURCE_DIR} ${opencv_BINARY_DIR} EXCLUDE_FROM_ALL)
-    message(STATUS "[OpenCV] Configuration done.")
-else()
-    message(STATUS "[OpenCV] Already populated, skipping download.")
-endif()
+add_library(opencv::core ALIAS opencv_core)
+target_include_directories(opencv_core INTERFACE 
+    "$<BUILD_INTERFACE:${opencv_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${opencv_SOURCE_DIR}/modules/core/include>"
+    "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>"
+)
 
-if(TARGET opencv_core)
-    message(STATUS "[OpenCV] Targets available: opencv_core, opencv_imgproc")
-else()
-    message(WARNING "[OpenCV] Target opencv_core not found! Check BUILD_LIST.")
-endif()
+add_library(opencv::videoio ALIAS opencv_videoio)
+target_include_directories(opencv_videoio INTERFACE 
+    "$<BUILD_INTERFACE:${opencv_SOURCE_DIR}/modules/videoio/include>"
+)
+
+add_library(opencv::imgproc ALIAS opencv_imgproc)
+target_include_directories(opencv_imgproc INTERFACE 
+    "$<BUILD_INTERFACE:${opencv_SOURCE_DIR}/modules/imgproc/include>"
+)

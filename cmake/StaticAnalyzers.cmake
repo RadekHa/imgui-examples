@@ -8,7 +8,7 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL "Release")
       set(CMAKE_CXX_CLANG_TIDY "${CMAKE_CXX_CLANG_TIDY};--extra-arg=/EHsc")
     endif ()
   else ()
-    message(WARNING "clang-tidy requested but executable not found")
+    message(STATUS "clang-tidy requested but executable not found")
   endif ()
 
   # This will gradually increase memory usage of the program,
