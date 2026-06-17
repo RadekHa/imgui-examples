@@ -45,15 +45,15 @@ ExitStatus Application::run ()
     CameraFrame frame;
     SdlCameraTexture camTexture{m_renderer.native ()};
 
-    if (camera)
-    {
-        camera->read (frame);
-        camTexture.update (frame);
-    }
 
     while (m_isRunning)
     {
         ZoneScopedN ("MainLoop");
+
+        if (camera && camera->read (frame))
+        {
+            camTexture.update (frame);
+        }
         FrameContext frameContext;
 
         m_window.pollEvents (events);
