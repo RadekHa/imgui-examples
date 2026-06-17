@@ -27,9 +27,7 @@ OpenCVCamera::OpenCVCamera ()
     m_capture.set (cv::CAP_PROP_READ_TIMEOUT_MSEC, 2000);
 }
 
-OpenCVCamera::~OpenCVCamera ()
-{
-}
+OpenCVCamera::~OpenCVCamera () = default;
 
 bool OpenCVCamera::open (int cameraIndex)
 {
@@ -76,23 +74,25 @@ void OpenCVCamera::close ()
 
 bool OpenCVCamera::read (CameraFrame& frame)
 {
-    lock_guard lock{m_mutex};
-    bool result = {};
-
-    if (m_isNewFrame)
     {
+        lock_guard lock{m_mutex};
+
+        if (!m_isNewFrame)
+        {
+            return false;
+        }
         swap (m_frontBuffer, m_backBuffer);
         m_isNewFrame = false;
-
-        cv::cvtColor (m_frontBuffer, m_rgb, cv::COLOR_BGR2RGB);
-
-        frame.data = m_rgb.data;
-        frame.width = m_rgb.cols;
-        frame.height = m_rgb.rows;
-        frame.channels = m_rgb.channels ();
-        result = true;
     }
-    return result;
+
+    cv::cvtColor (m_frontBuffer, m_rgb, cv::COLOR_BGR2RGB);
+
+    frame.data = m_rgb.data;
+    frame.width = m_rgb.cols;
+    frame.height = m_rgb.rows;
+    frame.channels = m_rgb.channels ();
+
+    return true;
 }
 
 bool OpenCVCamera::isOpen () const
