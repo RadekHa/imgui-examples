@@ -5,7 +5,7 @@
 
 #include <memory>
 
-namespace App
+namespace TraceLog
 {
     class Log
     {
@@ -35,22 +35,22 @@ namespace App
 
         std::shared_ptr<spdlog::logger> m_logger;
     };
-}  // namespace App
+}  // namespace TraceLog
 
 #ifndef APP_DEACTIVATE_LOGGING
 
 #if DEBUG
-#define APP_TRACE(...) ::App::Log::logger ()->trace (__VA_ARGS__)
-#define APP_DEBUG(...) ::App::Log::logger ()->debug (__VA_ARGS__)
+#define APP_TRACE(...) ::TraceLog::Log::logger ()->trace (__VA_ARGS__)
+#define APP_DEBUG(...) ::TraceLog::Log::logger ()->debug (__VA_ARGS__)
 #else
 #define APP_TRACE(...)
 #define APP_DEBUG(...)
 #endif
 
-#define APP_INFO(...) ::App::Log::logger ()->info (__VA_ARGS__)
-#define APP_WARN(...) ::App::Log::logger ()->warn (__VA_ARGS__)
-#define APP_ERROR(...) ::App::Log::logger ()->error (__VA_ARGS__)
-#define APP_FATAL(...) ::App::Log::logger ()->critical (__VA_ARGS__)
+#define APP_INFO(...) ::TraceLog::Log::logger ()->info (__VA_ARGS__)
+#define APP_WARN(...) ::TraceLog::Log::logger ()->warn (__VA_ARGS__)
+#define APP_ERROR(...) ::TraceLog::Log::logger ()->error (__VA_ARGS__)
+#define APP_FATAL(...) ::TraceLog::Log::logger ()->critical (__VA_ARGS__)
 
 #else
 

@@ -1,10 +1,14 @@
 #include "Application.hpp"
+#include "Camera/ICamera.h"
 #include "DpiHandler.h"
 #include "FrameContext.h"
+#include "SdlCameraTexture.h"
 #include "TraceLog/Log.hpp"
 #include "TraceLog/Tracy.hpp"
 
 using namespace App;
+using namespace Camera;
+using namespace Sdl;
 using namespace std;
 
 Application::Application (const string& title, const IPathService* paths)
@@ -36,9 +40,20 @@ ExitStatus Application::run ()
 
     vector<SDL_Event> events;
 
+    unique_ptr<ICamera> camera = createCamera (0);
+
+    CameraFrame frame;
+    SdlCameraTexture camTexture{m_renderer.native ()};
+
+
     while (m_isRunning)
     {
         ZoneScopedN ("MainLoop");
+
+        if (camera && camera->read (frame))
+        {
+            camTexture.update (frame);
+        }
         FrameContext frameContext;
 
         m_window.pollEvents (events);
@@ -51,7 +66,7 @@ ExitStatus Application::run ()
 
         if (!m_isMinimized)
         {
-            m_ui.update (m_model);
+            m_ui.update (m_model, &camTexture);
             m_renderer.update (m_model);
         }
         m_imgui.endFrame ();

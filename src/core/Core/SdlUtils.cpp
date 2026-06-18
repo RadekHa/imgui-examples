@@ -5,7 +5,7 @@
 #include <stb_image.h>
 
 using namespace std;
-using namespace sdl;
+using namespace Sdl;
 
 namespace details
 {

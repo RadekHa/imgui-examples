@@ -5,7 +5,7 @@
 
 namespace fs = std::filesystem;
 using namespace App;
-using namespace sdl;
+using namespace Sdl;
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////

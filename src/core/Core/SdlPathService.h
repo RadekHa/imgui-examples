@@ -26,7 +26,7 @@ namespace App
         std ::string toString (const std::filesystem::path& filePath) const;
 
         /** Base path obtained from SDL to construct resource paths. */
-        sdl::SdlTextPtr m_basePath;
+        Sdl::SdlTextPtr m_basePath;
         /** Cached user configuration path to avoid redundant SDL calls. */
         std::string m_userConfigPath;
     };

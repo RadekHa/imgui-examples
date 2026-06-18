@@ -3,7 +3,7 @@
 
 #include <SDL.h>
 
-namespace sdl
+namespace Sdl
 {
     /** Base template for SDL deleter. */
     template<typename T>
