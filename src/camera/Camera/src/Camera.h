@@ -1,5 +1,5 @@
 #pragma once
-#include "ICamera.h"
+#include "Camera/ICamera.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
