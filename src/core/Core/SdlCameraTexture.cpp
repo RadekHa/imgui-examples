@@ -23,8 +23,9 @@ SdlCameraTexture::SdlCameraTexture (SDL_Renderer* renderer)
 
 void SdlCameraTexture::update (const CameraFrame& frame)
 {
-    if (!frame.data || (frame.width <= 0) || (frame.height <= 0))
+    if (!frame.data || (frame.width <= 0) || (frame.height <= 0) || (frame.channels != 3))
     {
+        APP_WARN ("Camera frame has invalid format.");
         return;
     }
 
@@ -67,20 +68,17 @@ bool SdlCameraTexture::isValid () const
 
 void SdlCameraTexture::recreate (int width, int height)
 {
-    m_texture.reset ();
+    m_texture = SdlTexturePtr{SDL_CreateTexture (
+                                  m_renderer,
+                                  SDL_PIXELFORMAT_RGB24,
+                                  SDL_TEXTUREACCESS_STREAMING,
+                                  width, height)};
 
-    SDL_Texture* tex = SDL_CreateTexture (
-        m_renderer,
-        SDL_PIXELFORMAT_RGB24,
-        SDL_TEXTUREACCESS_STREAMING,
-        width, height);
-
-    if (!tex)
+    if (!m_texture)
     {
         APP_WARN ("SDL_CreateTexture failed: {}", SDL_GetError ());
         return;
     }
-    m_texture = SdlTexturePtr{tex};
     m_width = width;
     m_height = height;
 

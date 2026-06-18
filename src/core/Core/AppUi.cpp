@@ -35,7 +35,7 @@ void AppUi::update (DataModel& model, const SdlCameraTexture* camera)
         drawFpsGraph ();
     }
 
-    if (camera->isValid ())
+    if (camera && camera->isValid ())
     {
         ImGui::Begin ("Camera");
 

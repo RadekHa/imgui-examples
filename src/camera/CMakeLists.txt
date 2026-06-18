@@ -12,5 +12,4 @@ target_compile_features(${NAME} PRIVATE cxx_std_20)
 
 target_link_libraries(${NAME}
   PRIVATE TraceLog project_warnings opencv::core opencv::videoio opencv::imgproc
-  PUBLIC  
 )

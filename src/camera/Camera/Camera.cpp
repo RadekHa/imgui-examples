@@ -12,8 +12,11 @@ using namespace std;
 unique_ptr<ICamera> Camera::createCamera (int cameraIndex)
 {
     unique_ptr<OpenCVCamera> cam = make_unique<OpenCVCamera>();
-    cam->open (cameraIndex);
 
+    if (!cam->open (cameraIndex))
+    {
+        return nullptr;
+    }
     return cam;
 }
 
@@ -97,7 +100,7 @@ bool OpenCVCamera::read (CameraFrame& frame)
 
 bool OpenCVCamera::isOpen () const
 {
-    return m_thread.joinable () && m_capture.isOpened ();
+    return m_capture.isOpened ();
 }
 
 void OpenCVCamera::captureLoop (stop_token stopToken)
