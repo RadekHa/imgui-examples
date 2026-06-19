@@ -9,12 +9,6 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
-  fmt
-  GIT_REPOSITORY "https://github.com/fmtlib/fmt.git"
-  GIT_TAG 11.0.2
-)
-
-FetchContent_Declare(
   imgui
   GIT_REPOSITORY "https://github.com/ocornut/imgui.git"
   GIT_TAG docking
@@ -58,9 +52,13 @@ FetchContent_Declare(
 # For SDL2 to be able to override options
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(FMT_INSTALL OFF)
 set(SDL2_DISABLE_SDL2MAIN ON)
-set(SPDLOG_FMT_EXTERNAL ON)
+set(SPDLOG_FMT_EXTERNAL OFF)
+set(SPDLOG_USE_STD_FORMAT ON)
 
 add_subdirectory(imgui-setup)
 add_subdirectory(stb-setup)
@@ -68,4 +66,4 @@ add_subdirectory(opencv-setup)
 
 # Populate
 
-FetchContent_MakeAvailable(Catch2 fmt SDL2 spdlog tracy)
+FetchContent_MakeAvailable(Catch2 SDL2 spdlog tracy)
