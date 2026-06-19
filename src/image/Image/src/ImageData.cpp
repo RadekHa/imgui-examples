@@ -17,7 +17,7 @@ unique_ptr<IImageData> Image::loadImage (string_view filePath, int desiredChanne
 
     if (!raw)
     {
-        APP_ERROR ("loadImage '{}': {}", filePath, stbi_failure_reason ());
+        APP_ERROR ("Image failed to load '{}': {}", filePath, stbi_failure_reason ());
         return nullptr;
     }
     const int actualChannels = (desiredChannels != 0) ? desiredChannels : ch;

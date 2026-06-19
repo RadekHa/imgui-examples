@@ -2,6 +2,7 @@
 
 namespace Image
 {
+    /** Implementation of IImageData interface. */
     class ImageData : public IImageData
     {
     public:
@@ -20,9 +21,13 @@ namespace Image
         int getChannels () const override;
 
     private:
+        /** Image data. */
         unsigned char* m_pixels;
+        /** Width of the image. */
         int m_width;
+        /** Height of the image. */
         int m_height;
+        /** Number of channels. */
         int m_channels;
     };
 }
