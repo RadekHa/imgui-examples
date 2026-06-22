@@ -4,6 +4,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <string>
+
 using namespace std;
 using namespace Image;
 
@@ -13,7 +15,10 @@ using namespace Image;
 unique_ptr<IImageData> Image::loadImage (string_view filePath, int desiredChannels)
 {
     int w{}, h{}, ch{};
-    unsigned char* raw = stbi_load (filePath.data (), &w, &h, &ch, desiredChannels);
+
+    const string pathName{filePath};
+
+    unsigned char* raw = stbi_load (pathName.c_str (), &w, &h, &ch, desiredChannels);
 
     if (!raw)
     {
