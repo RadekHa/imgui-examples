@@ -1,37 +1,16 @@
+#include "Image/IImageData.h"
 #include "SdlUtils.h"
 #include "TraceLog/Log.hpp"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 
 using namespace std;
 using namespace Sdl;
 
-namespace details
-{
-    /** A deleter for stb image. */
-    struct StbImageDeleter
-    {
-        void operator() (unsigned char* ptr) const
-        {
-            if (ptr)
-            {
-                stbi_image_free (ptr);
-            }
-        }
-    };
+///////////////////////////////////////////////////////////////////////////////
+// Function definition.
 
-    /** RAII smart pointer for stb image. */
-    using StbImagePtr = unique_ptr<unsigned char, StbImageDeleter>;
-}
-
-
-SdlTexturePtr App::LoadTexture (SDL_Renderer* renderer, const char* filePath)
+SdlTexturePtr App::LoadTexture (SDL_Renderer* renderer, string_view filePath)
 {
     SdlTexturePtr texture;
-    int width = 0;
-    int height = 0;
-    int bytesPerPixel = 0;
 
     // Check parameters.
     if (!renderer)
@@ -40,28 +19,32 @@ SdlTexturePtr App::LoadTexture (SDL_Renderer* renderer, const char* filePath)
         return nullptr;
     }
 
-    if (!filePath)
+    if (filePath.empty ())
     {
         APP_ERROR ("LoadTexture: filePath parameter cannot be null");
         return nullptr;
     }
     // Load pixels.
-    auto rawPixels = details::StbImagePtr{stbi_load (filePath, &width, &height, &bytesPerPixel, STBI_rgb_alpha)};
+    constexpr int desiredChannels = 4;
+    auto img = Image::loadImage (filePath, desiredChannels);
 
-    if (!rawPixels)
+    if (!img)
     {
-        APP_ERROR ("STB Image failed to load '{}': {}", filePath, stbi_failure_reason ());
         return nullptr;
     }
-    APP_INFO ("Loaded image '{}' ({}x{}, original channels: {})", filePath, width, height, bytesPerPixel);
+    APP_INFO ("Loaded image '{}' ({}x{}, channels: {})",
+              filePath,
+              img->getWidth (),
+              img->getHeight (),
+              img->getChannels ());
 
     texture = SdlTexturePtr{
         SDL_CreateTexture (
             renderer,
             SDL_PIXELFORMAT_RGBA32,
             SDL_TEXTUREACCESS_STATIC,
-            width,
-            height
+            img->getWidth (),
+            img->getHeight ()
             )
     };
 
@@ -70,9 +53,9 @@ SdlTexturePtr App::LoadTexture (SDL_Renderer* renderer, const char* filePath)
         APP_ERROR ("Failed to create texture from '{}': {}", filePath, SDL_GetError ());
         return nullptr;
     }
-    int pitch = width * 4;
+    int pitch = img->getWidth () * desiredChannels;
 
-    if (SDL_UpdateTexture (texture.get (), nullptr, rawPixels.get (), pitch) < 0)
+    if (SDL_UpdateTexture (texture.get (), nullptr, img->getPixels (), pitch) < 0)
     {
         APP_ERROR ("Failed to update texture from '{}': {}", filePath, SDL_GetError ());
         return nullptr;

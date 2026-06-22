@@ -29,7 +29,7 @@ target_compile_features(${NAME} PRIVATE cxx_std_20)
 
 target_link_libraries(${NAME}
   PRIVATE project_warnings
-  PUBLIC TraceLog SDL2::SDL2 imgui Settings stb::image Camera)
+  PUBLIC TraceLog Image SDL2::SDL2 imgui Settings Camera)
 
 
 add_subdirectory(Tests)
