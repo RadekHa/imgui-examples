@@ -163,7 +163,6 @@ void AppUi::update (DataModel& model, const SdlCameraTexture* camera)
         if (ImGui::BeginMenu ("View"))
         {
             ImGui::MenuItem ("Demo", nullptr, &model.showDemo);
-            ImGui::MenuItem ("Stats", nullptr, &model.showStats);
             ImGui::EndMenu ();
         }
         ImGui::EndMainMenuBar ();
