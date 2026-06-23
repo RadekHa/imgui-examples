@@ -3,23 +3,16 @@
 
 #include "imgui.h"
 
-#include <stdio.h>
 #include <string_view>
 
 using namespace App;
 using namespace Sdl;
 using namespace std;
+using namespace Ui;
 
 
-/** Declaration of the state interface. */
-class App::IUiState
-{
-public:
-    /** Virtual destructor to allow proper cleanup of derived classes. */
-    virtual ~IUiState () = default;
-    /** Update UI elements. */
-    virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) = 0;
-};
+///////////////////////////////////////////////////////////////////////////////
+// StateNull
 
 /** Null state. */
 class StateNull : public IUiState
@@ -31,6 +24,10 @@ public:
         return nullptr;
     }
 };
+
+
+///////////////////////////////////////////////////////////////////////////////
+// StateLogin
 
 /** Login window. */
 class StateLogin : public IUiState
@@ -51,7 +48,6 @@ private:
     /** Flag indicating that login is correct.*/
     bool m_loginFailed{};
 };
-
 
 IUiState* StateLogin::update (DataModel& model, const SdlCameraTexture* camera)
 {
@@ -110,6 +106,9 @@ bool StateLogin::isValid (string_view userName, string_view password) const
     return userName == "user" && password == "pwd";
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// StateStart
+
 class StateStart : public IUiState
 {
 public:
@@ -132,12 +131,6 @@ IUiState* StateStart::update (DataModel& model, const SdlCameraTexture* camera)
         ImGui::Text ("All those beautiful files will be deleted.\nThis operation cannot be undone!");
         ImGui::Separator ();
 
-        static bool dont_ask_me_next_time = false;
-
-        ImGui::PushStyleVar (ImGuiStyleVar_FramePadding, ImVec2 (0, 0));
-        ImGui::Checkbox ("Don't ask me next time", &dont_ask_me_next_time);
-        ImGui::PopStyleVar ();
-
         if (ImGui::Button ("OK", ImVec2 (120, 0)))
         {
             ImGui::CloseCurrentPopup ();
@@ -148,6 +141,9 @@ IUiState* StateStart::update (DataModel& model, const SdlCameraTexture* camera)
     }
     return state;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// AppUi
 
 AppUi::AppUi ()
     : m_state {new StateStart}
@@ -209,42 +205,4 @@ void AppUi::update (DataModel& model, const SdlCameraTexture* camera)
     {
         m_state.reset (state);
     }
-}
-
-void AppUi::drawFpsGraph ()
-{
-    static float values [90]{};
-    static int offset{};
-    static double nextTime{};
-
-    if (ImGui::GetTime () > nextTime)
-    {
-        values [offset] = ImGui::GetIO ().Framerate;
-        offset = (offset + 1) % IM_ARRAYSIZE (values);
-        nextTime = ImGui::GetTime () + 0.1;
-    }
-    float avg{};
-
-    for (float v : values)
-    {
-        avg += v;
-    }
-    avg /= IM_ARRAYSIZE (values);
-
-    char overlay [32];
-    snprintf (overlay, sizeof (overlay), "AVG %.1f FPS", avg);
-
-    ImGui::Begin ("Stats");
-
-    ImGui::PlotLines (
-        "FPS",
-        values,
-        IM_ARRAYSIZE (values),
-        offset,
-        overlay,
-        0.0f,
-        120.0f,
-        ImVec2 (0, 80));
-
-    ImGui::End ();
 }

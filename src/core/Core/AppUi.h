@@ -9,10 +9,17 @@ namespace Sdl
     class SdlCameraTexture;
 }
 
-namespace App
+namespace Ui
 {
-    /** Forward declaration of the state interface. */
-    class IUiState;
+    /** Declaration of the state interface. */
+    class IUiState
+    {
+    public:
+        /** Virtual destructor to allow proper cleanup of derived classes. */
+        virtual ~IUiState () = default;
+        /** Update UI elements. */
+        virtual IUiState* update (App::DataModel& model, const Sdl::SdlCameraTexture* camera) = 0;
+    };
 
     /** User Interface for the Application */
     class AppUi
@@ -24,11 +31,9 @@ namespace App
         ~AppUi ();
 
         /** Updates the UI based on the given data model. */
-        void update (DataModel& model, const Sdl::SdlCameraTexture* camera);
+        void update (App::DataModel& model, const Sdl::SdlCameraTexture* camera);
 
     private:
-        /** Draws a graph of the FPS over time. */
-        void drawFpsGraph ();
         /** Current state of the UI. */
         std::unique_ptr<IUiState> m_state;
     };
