@@ -7,7 +7,5 @@ namespace App
     {
         /** Flag indicating whether to show the ImGui demo window. */
         bool showDemo{true};
-        /** Flag indicating whether to show the statistics overlay. */
-        bool showStats{true};
     };
 }

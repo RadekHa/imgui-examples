@@ -68,6 +68,6 @@ namespace App
         /** The SDL event translator for processing SDL events and translating them into application events. */
         SdlEventTranslator m_eventTranslator;
         /** The user interface for the application. */
-        AppUi m_ui;
+        Ui::AppUi m_ui;
     };
 }
