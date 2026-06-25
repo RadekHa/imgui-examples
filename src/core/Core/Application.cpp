@@ -1,5 +1,4 @@
 #include "Application.hpp"
-#include "Camera/ICamera.h"
 #include "DpiHandler.h"
 #include "FrameContext.h"
 #include "SdlCameraTexture.h"
@@ -18,8 +17,12 @@ Application::Application (const string& title, const IPathService* paths)
     , m_window (title)
     , m_renderer (m_window.native (), paths)
     , m_imgui (m_window.native (), m_renderer.native (), paths)
+    , m_camera {createCamera (0)}
 {
     ZoneScoped;
+
+    m_camera->setTemplate (paths->getResourcePath ("images/smile.png"));
+
     init ();
 }
 
@@ -40,17 +43,16 @@ ExitStatus Application::run ()
 
     vector<SDL_Event> events;
 
-    unique_ptr<ICamera> camera = createCamera (0);
-
     CameraFrame frame;
     SdlCameraTexture camTexture{m_renderer.native ()};
 
+    MatchResult matchResult;
 
     while (m_isRunning)
     {
         ZoneScopedN ("MainLoop");
 
-        if (camera && camera->read (frame))
+        if (m_camera && m_camera->read (frame, matchResult))
         {
             camTexture.update (frame);
         }

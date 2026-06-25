@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <memory>
-#include <string>
+#include <string_view>
 
 namespace Camera
 {
@@ -9,13 +9,8 @@ namespace Camera
     {
         /** Flag, that the template was found in the frame. */
         bool found{false};
-        /** Position and size of the found template. */
-        int x{};
-        int y{};
-        int width{};
-        int height{};
-        /** Confidence of the match 0.0 - 1.0. */
-        float confidence{};
+        double angleDeg{};
+        int goodMatches{};
     };
 
     struct CameraFrame
@@ -37,8 +32,12 @@ namespace Camera
         virtual void close () = 0;
         /** Read frame from camera, return true if frame is successfully retrieved. */
         virtual bool read (CameraFrame& frame) = 0;
+        /** Read frame from camera with matchResult state, return true if frame is successfully retrieved. */
+        virtual bool read (CameraFrame& frame, MatchResult& matchResult) = 0;
         /** Return true if the camera is open. */
         virtual bool isOpen () const = 0;
+
+        virtual bool setTemplate (std::string_view fileName) = 0;
     };
 
     /** Factory function to create an instance of ICamera. */

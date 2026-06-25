@@ -1,5 +1,6 @@
 #pragma once
 #include "AppUi.h"
+#include "Camera/ICamera.h"
 #include "DataModel.h"
 #include "EventBus.h"
 #include "ImGuiPass.h"
@@ -69,5 +70,7 @@ namespace App
         SdlEventTranslator m_eventTranslator;
         /** The user interface for the application. */
         Ui::AppUi m_ui;
+
+        std::unique_ptr<Camera::ICamera> m_camera;
     };
 }

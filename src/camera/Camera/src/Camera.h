@@ -11,6 +11,26 @@
 
 namespace Camera
 {
+    class Matcher
+    {
+    public:
+        Matcher ();
+
+        bool setTemplate (const cv::Mat& grayTemplate);
+        void clearTemplate ();
+        bool hasTemplate () const;
+
+        MatchResult match (const cv::Mat& frame) const;
+
+    private:
+        cv::Ptr<cv::ORB>      m_orb;
+        cv::Ptr<cv::BFMatcher> m_matcher;
+
+        std::vector<cv::KeyPoint> m_templateKeypoints;
+        cv::Mat m_templateDescriptors;
+    };
+
+
     class OpenCVCamera : public ICamera
     {
     public:
@@ -24,15 +44,15 @@ namespace Camera
 
         /** {@inheritDoc} */
         void close () override;
-
+        /** {@inheritDoc} */
         bool read (CameraFrame& frame, MatchResult& matchResult);
-
+        /** {@inheritDoc} */
         bool read (CameraFrame& frame) override;
         /** {@inheritDoc} */
         bool isOpen () const override;
+        /** {@inheritDoc} */
+        virtual bool setTemplate (std::string_view fileName);
 
-        /** Set template image to search for in the camera frames. */
-        void setTemplate (const cv::Mat& templ);
         /** Clear the template image. */
         void clearTemplate ();
     private:
@@ -56,18 +76,10 @@ namespace Camera
 
         /** Last match result from runMatching. */
         MatchResult m_matchResult;
-
         /** Mutex for protecting template members. */
         std::mutex m_templateMutex;
-        /** Grayscale template image. */
-        cv::Mat m_template;
 
-        cv::Ptr<cv::ORB> m_orbDetector;
-        cv::Ptr<cv::BFMatcher> m_matcher;
-
-        std::vector<cv::KeyPoint> m_templateKeypoints;
-        cv::Mat m_templateDescriptors;
-        cv::Size m_templateSize;
+        Matcher m_matcher;
 
         /** Thread for asynchronous reading. */
         std::jthread m_thread;
