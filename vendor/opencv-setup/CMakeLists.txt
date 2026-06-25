@@ -1,5 +1,5 @@
 
-set(BUILD_LIST "core,imgproc,videoio" CACHE STRING "" FORCE)
+set(BUILD_LIST "core,imgproc,videoio,features,calib" CACHE STRING "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(BUILD_PERF_TESTS OFF CACHE BOOL "" FORCE)
@@ -26,4 +26,17 @@ target_include_directories(opencv_videoio INTERFACE
 add_library(opencv::imgproc ALIAS opencv_imgproc)
 target_include_directories(opencv_imgproc INTERFACE 
     "$<BUILD_INTERFACE:${opencv_SOURCE_DIR}/modules/imgproc/include>"
+)
+
+add_library(opencv::features ALIAS opencv_features)
+target_include_directories(opencv_imgproc INTERFACE 
+    "$<BUILD_INTERFACE:${opencv_SOURCE_DIR}/modules/features/include>"
+    "$<BUILD_INTERFACE:${opencv_SOURCE_DIR}/modules/flann/include>"
+)
+
+add_library(opencv::calib ALIAS opencv_calib)
+target_include_directories(opencv_imgproc INTERFACE 
+    "$<BUILD_INTERFACE:${opencv_SOURCE_DIR}/modules/calib/include>"
+    "$<BUILD_INTERFACE:${opencv_SOURCE_DIR}/modules/geometry/include>"
+    "$<BUILD_INTERFACE:${opencv_SOURCE_DIR}/modules/stereo/include>"
 )

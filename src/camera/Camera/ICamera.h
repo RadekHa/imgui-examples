@@ -5,6 +5,19 @@
 
 namespace Camera
 {
+    struct MatchResult
+    {
+        /** Flag, that the template was found in the frame. */
+        bool found{false};
+        /** Position and size of the found template. */
+        int x{};
+        int y{};
+        int width{};
+        int height{};
+        /** Confidence of the match 0.0 - 1.0. */
+        float confidence{};
+    };
+
     struct CameraFrame
     {
         const uint8_t* data{nullptr};
