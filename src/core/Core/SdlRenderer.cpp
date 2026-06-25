@@ -70,14 +70,26 @@ void SdlRenderer::update (DataModel& model)
 {
     if (m_background)
     {
-        int textureWidth = 0;
-        int textureHeight = 0;
+        int texW = 0, texH = 0;
+        SDL_QueryTexture (m_background.get (), nullptr, nullptr, &texW, &texH);
 
-        SDL_QueryTexture (m_background.get (), nullptr, nullptr, &textureWidth, &textureHeight);
+        int renderW = 0, renderH = 0;
+        SDL_GetRendererOutputSize (m_renderer.get (), &renderW, &renderH);
 
-        SDL_Rect destinationRect{.x = 50, .y = 50, .w = textureWidth, .h = textureHeight};
+        float scaleX = (float) renderW / texW;
+        float scaleY = (float) renderH / texH;
 
-        SDL_RenderCopy (m_renderer.get (), m_background.get (), nullptr, nullptr);
-        SDL_RenderCopy (m_renderer.get (), m_background.get (), nullptr, &destinationRect);
+        float scale = (scaleX < scaleY) ? scaleX : scaleY;
+
+        int newW = (int) (texW * scale);
+        int newH = (int) (texH * scale);
+
+        SDL_Rect destRect;
+        destRect.w = newW;
+        destRect.h = newH;
+        destRect.x = (renderW - newW) / 2;
+        destRect.y = (renderH - newH) / 2;
+
+        SDL_RenderCopy (m_renderer.get (), m_background.get (), nullptr, &destRect);
     }
 }
