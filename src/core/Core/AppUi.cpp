@@ -116,7 +116,7 @@ public:
     virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
 };
 
-IUiState* StateStart::update (DataModel& model, const SdlCameraTexture* camera)
+IUiState* StateStart::update (DataModel& /*model*/, const SdlCameraTexture* /*camera*/)
 {
     IUiState* state = nullptr;
 
@@ -124,11 +124,13 @@ IUiState* StateStart::update (DataModel& model, const SdlCameraTexture* camera)
     ImGui::SetNextWindowPos (center, ImGuiCond_Appearing, ImVec2 (0.5f, 0.5f));
     ImGui::SetNextWindowFocus ();
 
-    ImGui::OpenPopup ("Start");
+    constexpr string_view popupTitle = "Upozornění";
 
-    if (ImGui::BeginPopupModal ("Start", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    ImGui::OpenPopup (popupTitle.data ());
+
+    if (ImGui::BeginPopupModal (popupTitle.data (), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        ImGui::Text ("All those beautiful files will be deleted.\nThis operation cannot be undone!");
+        ImGui::Text ("Zařízení aktivováno!\nPro deaktivaci se přihlašte.");
         ImGui::Separator ();
 
         if (ImGui::Button ("OK", ImVec2 (120, 0)))
@@ -143,11 +145,56 @@ IUiState* StateStart::update (DataModel& model, const SdlCameraTexture* camera)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// StateCamera
+
+class StateCamera : public IUiState
+{
+public:
+    /** {@inheritDoc} */
+    virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
+};
+
+IUiState* StateCamera::update (DataModel& model, const SdlCameraTexture* camera)
+{
+    if (camera && camera->isValid ())
+    {
+        ImGui::SetNextWindowPos (ImVec2 (0.0f, 0.0f), ImGuiCond_Once);
+        ImGui::SetNextWindowSize (ImVec2 (320.0f, 240.0f), ImGuiCond_Once);
+
+        ImGui::Begin ("Verifikace");
+        ImGui::Text ("Usměj se :)");
+
+        ImVec2 available = ImGui::GetContentRegionAvail ();
+
+        float texW = float (camera->getWidth ());
+        float texH = float (camera->getHeight ());
+
+        float scale = std::min (available.x / texW, available.y / texH);
+        ImVec2 size = ImVec2 (texW * scale, texH * scale);
+
+        ImVec2 cursor = ImGui::GetCursorPos ();
+
+        ImVec2 pos = ImVec2 (cursor.x + (available.x - size.x) * 0.5f,
+                             cursor.y + (available.y - size.y) * 0.5f);
+
+        ImGui::SetCursorPos (pos);
+
+        ImGui::Image (camera->getImguiTextureId (),
+                      size,
+                      ImVec2 (1, 0),
+                      ImVec2 (0, 1));
+        ImGui::End ();
+    }
+    return nullptr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // AppUi
 
 AppUi::AppUi ()
-    : m_state {new StateStart}
 {
+    m_states.emplace_back (new StateCamera);
+    m_states.emplace_back (new StateStart);
 }
 
 AppUi::~AppUi () = default;
@@ -172,36 +219,27 @@ void AppUi::update (DataModel& model, const SdlCameraTexture* camera)
     {
         ImGui::ShowDemoWindow (&model.showDemo);
     }
+    vector<unique_ptr<IUiState> > nextStates;
+    nextStates.reserve (m_states.size ());
 
-    if (camera && camera->isValid ())
+    for (auto& oldStatePtr : m_states)
     {
-        ImGui::Begin ("Camera");
+        unique_ptr<IUiState> currentState = move (oldStatePtr);
 
-        ImVec2 available = ImGui::GetContentRegionAvail ();
+        if (!currentState)
+        {
+            continue;
+        }
+        IUiState* result = currentState->update (model, camera);
 
-        float texW = float (camera->getWidth ());
-        float texH = float (camera->getHeight ());
-
-        float scale = std::min (available.x / texW, available.y / texH);
-        ImVec2 size = ImVec2 (texW * scale, texH * scale);
-
-        ImVec2 cursor = ImGui::GetCursorPos ();
-
-        ImVec2 pos = ImVec2 (cursor.x + (available.x - size.x) * 0.5f,
-                             cursor.y + (available.y - size.y) * 0.5f);
-
-        ImGui::SetCursorPos (pos);
-
-        ImGui::Image (camera->getImguiTextureId (),
-                      size,
-                      ImVec2 (1, 0),
-                      ImVec2 (0, 1));
-        ImGui::End ();
+        if (result == nullptr)
+        {
+            nextStates.push_back (move (currentState));
+        }
+        else
+        {
+            nextStates.emplace_back (result);
+        }
     }
-    IUiState* state = m_state->update (model, camera);
-
-    if (state != nullptr)
-    {
-        m_state.reset (state);
-    }
+    m_states = move (nextStates);
 }

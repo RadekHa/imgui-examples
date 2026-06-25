@@ -2,6 +2,7 @@
 #include "DataModel.h"
 
 #include <memory>
+#include <vector>
 
 namespace Sdl
 {
@@ -35,6 +36,6 @@ namespace Ui
 
     private:
         /** Current state of the UI. */
-        std::unique_ptr<IUiState> m_state;
+        std::vector<std::unique_ptr<IUiState> > m_states;
     };
 }
