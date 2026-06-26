@@ -10,6 +10,17 @@ using namespace Sdl;
 using namespace std;
 using namespace Ui;
 
+///////////////////////////////////////////////////////////////////////////////
+// StateCounter
+
+/** Null state. */
+class StateCounter : public IUiState
+{
+public:
+    /** {@inheritDoc} */
+    virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
+};
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // StateNull
@@ -19,7 +30,7 @@ class StateNull : public IUiState
 {
 public:
     /** {@inheritDoc} */
-    virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override
+    virtual IUiState* update (DataModel& /*model*/, const SdlCameraTexture* /*camera*/) override
     {
         return nullptr;
     }
@@ -71,8 +82,39 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// StateLogin
+// StateCounter
 
+IUiState* StateCounter::update (DataModel& model, const SdlCameraTexture* /*camera*/)
+{
+    ImGui::SetNextWindowPos (ImVec2 (0.0f, 0.0f), ImGuiCond_Once);
+
+    int min = 60;
+    int sec = 0;
+
+    if (model.startTime > 0)
+    {
+        auto currentTime = ImGui::GetTime ();
+        auto runTime = currentTime - model.startTime;
+
+        int rest = max (0, 60 * 60 - static_cast<int> (runTime));
+
+        min = rest / 60;
+        sec = rest % 60;
+    }
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar |
+                                   ImGuiWindowFlags_NoResize |
+                                   ImGuiWindowFlags_NoDocking |
+                                   ImGuiWindowFlags_AlwaysAutoResize;
+
+    ImGui::Begin ("Odpočet", nullptr, windowFlags);
+    ImGui::Text ("%02d:%02d", min, sec);
+    ImGui::End ();
+
+    return nullptr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// StateLogin
 
 IUiState* StateLogin::update (DataModel& model, const SdlCameraTexture* camera)
 {
@@ -82,7 +124,6 @@ IUiState* StateLogin::update (DataModel& model, const SdlCameraTexture* camera)
 
     ImVec2 center = ImGui::GetMainViewport ()->GetCenter ();
     ImGui::SetNextWindowPos (center, ImGuiCond_Appearing, ImVec2 (0.5f, 0.5f));
-    ImGui::SetNextWindowFocus ();
 
     ImGui::OpenPopup (popupTitle.data ());
 
@@ -134,13 +175,12 @@ bool StateLogin::isValid (string_view userName, string_view password) const
 ///////////////////////////////////////////////////////////////////////////////
 // StateStart
 
-IUiState* StateStart::update (DataModel& /*model*/, const SdlCameraTexture* /*camera*/)
+IUiState* StateStart::update (DataModel& model, const SdlCameraTexture* /*camera*/)
 {
     IUiState* state = nullptr;
 
     ImVec2 center = ImGui::GetMainViewport ()->GetCenter ();
     ImGui::SetNextWindowPos (center, ImGuiCond_Appearing, ImVec2 (0.5f, 0.5f));
-    ImGui::SetNextWindowFocus ();
 
     constexpr string_view popupTitle = "Upozornění";
 
@@ -153,6 +193,7 @@ IUiState* StateStart::update (DataModel& /*model*/, const SdlCameraTexture* /*ca
 
         if (ImGui::Button ("OK", ImVec2 (120, 0)))
         {
+            model.startTime = ImGui::GetTime ();
             ImGui::CloseCurrentPopup ();
 
             state = new StateLogin;
@@ -217,6 +258,7 @@ IUiState* StateCamera::update (DataModel& model, const SdlCameraTexture* camera)
 
 AppUi::AppUi ()
 {
+    m_states.emplace_back (new StateCounter);
     m_states.emplace_back (new StateStart);
 }
 
