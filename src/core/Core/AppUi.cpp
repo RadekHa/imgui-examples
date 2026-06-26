@@ -29,7 +29,6 @@ namespace details
 ///////////////////////////////////////////////////////////////////////////////
 // StateCounter
 
-/** Null state. */
 class StateCounter : public IUiState
 {
 public:
@@ -96,6 +95,23 @@ public:
     virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
 };
 
+///////////////////////////////////////////////////////////////////////////////
+// StateSerial
+
+class StateSerial : public IUiState
+{
+public:
+    /** Initialize members. */
+    StateSerial ();
+    /** {@inheritDoc} */
+    virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
+private:
+    bool m_isConnected;
+    bool m_deviceActive;
+    bool m_soundEnabled;
+    bool m_ledEnabled;
+};
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // StateCounter
@@ -132,7 +148,7 @@ IUiState* StateCounter::update (DataModel& model, const SdlCameraTexture* /*came
 ///////////////////////////////////////////////////////////////////////////////
 // StateLogin
 
-IUiState* StateLogin::update (DataModel& model, const SdlCameraTexture* camera)
+IUiState* StateLogin::update (DataModel& /*model*/, const SdlCameraTexture* /*camera*/)
 {
     IUiState* state = nullptr;
 
@@ -190,7 +206,7 @@ IUiState* StateLogin::update (DataModel& model, const SdlCameraTexture* camera)
         }
         ImGui::Separator ();
 
-        if (ImGui::Button ("Přihlásit se", ImVec2 (120, 0)))
+        if (ImGui::Button ("Přihlásit se", ImVec2 (-1, 0)))
         {
             if (isValid (m_username, m_password))
             {
@@ -252,7 +268,7 @@ IUiState* StateStart::update (DataModel& model, const SdlCameraTexture* /*camera
 ///////////////////////////////////////////////////////////////////////////////
 // StateCamera
 
-IUiState* StateCamera::update (DataModel& model, const SdlCameraTexture* camera)
+IUiState* StateCamera::update (DataModel& /*model*/, const SdlCameraTexture* camera)
 {
     IUiState* state = nullptr;
 
@@ -301,11 +317,119 @@ IUiState* StateCamera::update (DataModel& model, const SdlCameraTexture* camera)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// StateSerial
+
+StateSerial::StateSerial ()
+    : m_isConnected {}
+    , m_deviceActive {true}
+    , m_soundEnabled {true}
+    , m_ledEnabled {}
+{
+}
+
+IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
+{
+    static char deviceAddress [128] = "192.168.1.50";
+    static int devicePort = 8080;
+
+    ImVec2 center = ImGui::GetMainViewport ()->GetCenter ();
+    ImGui::SetNextWindowPos (center, ImGuiCond_Appearing, ImVec2 (0.5f, 0.5f));
+
+    ImGui::Begin ("Správce zařízení");
+    ImGui::TextDisabled ("1. NASTAVENÍ PŘIPOJENÍ");
+
+    ImGui::BeginDisabled (m_isConnected);
+    {
+        if (ImGui::BeginTable ("ConnectionTable", 3, ImGuiTableFlags_SizingFixedFit))
+        {
+            ImGui::TableSetupColumn ("Label");
+            ImGui::TableSetupColumn ("Input", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn ("Hint");
+
+            ImGui::TableNextRow ();
+
+            ImGui::TableNextColumn ();
+            ImGui::AlignTextToFramePadding ();
+            ImGui::Text ("Adresa / IP:");
+
+            ImGui::TableNextColumn ();
+            ImGui::SetNextItemWidth (-1.0f);
+            ImGui::InputText ("##Adresa", deviceAddress, IM_ARRAYSIZE (deviceAddress));
+
+            ImGui::TableNextColumn ();
+            details::HelpMarker ("Sem prijde napoveda.");
+
+            ImGui::TableNextRow ();
+
+            ImGui::TableNextColumn ();
+            ImGui::AlignTextToFramePadding ();
+            ImGui::Text ("Port:");
+
+            ImGui::TableNextColumn ();
+            ImGui::SetNextItemWidth (-1.0f);
+            ImGui::InputInt ("##Port", &devicePort, 0, 0);
+
+            ImGui::TableNextColumn ();
+            details::HelpMarker ("Sem prijde napoveda.");
+
+            ImGui::TableSetColumnIndex (2);
+
+            ImGui::EndTable ();
+        }
+    }
+    ImGui::EndDisabled ();
+
+    ImGui::Spacing ();
+
+    if (!m_isConnected)
+    {
+        if (ImGui::Button ("Připojit k zařízení", ImVec2 (-1, 30)))
+        {
+            m_isConnected = true;
+        }
+    }
+    else
+    {
+        ImGui::PushStyleColor (ImGuiCol_Button, ImVec4 (0.6f, 0.1f, 0.1f, 1.0f)); // Červené tlačítko pro odpojení
+
+        if (ImGui::Button ("Odpojit", ImVec2 (-1, 30)))
+        {
+            m_isConnected = false;
+        }
+        ImGui::PopStyleColor ();
+    }
+    ImGui::Separator ();
+
+    ImGui::TextDisabled ("2. OVLÁDÁNÍ ZAŘÍZENÍ");
+
+    ImGui::BeginDisabled (!m_isConnected);
+    {
+        ImGui::Checkbox ("Zařízení aktivní", &m_deviceActive);
+
+        ImGui::Spacing ();
+
+        ImGui::BeginDisabled (!m_deviceActive);
+        {
+            ImGui::Checkbox ("Zapnout zvuk", &m_soundEnabled);
+            ImGui::SameLine ();
+            ImGui::Checkbox ("Zapnout LED", &m_ledEnabled);
+        }
+        ImGui::EndDisabled ();
+    }
+    ImGui::EndDisabled ();
+
+    ImGui::End ();
+
+    return nullptr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // AppUi
 
 AppUi::AppUi ()
 {
     m_states.emplace_back (new StateCounter);
+    m_states.emplace_back (new StateSerial);
     m_states.emplace_back (new StateStart);
 }
 
