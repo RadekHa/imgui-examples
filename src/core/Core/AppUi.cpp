@@ -10,6 +10,22 @@ using namespace Sdl;
 using namespace std;
 using namespace Ui;
 
+namespace details
+{
+    void HelpMarker (const char* desc)
+    {
+        ImGui::TextDisabled ("(?)");
+
+        if (ImGui::BeginItemTooltip ())
+        {
+            ImGui::PushTextWrapPos (ImGui::GetFontSize () * 35.0f);
+            ImGui::TextUnformatted (desc);
+            ImGui::PopTextWrapPos ();
+            ImGui::EndTooltip ();
+        }
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // StateCounter
 
@@ -120,26 +136,57 @@ IUiState* StateLogin::update (DataModel& model, const SdlCameraTexture* camera)
 {
     IUiState* state = nullptr;
 
-    constexpr string_view popupTitle = "Přihlášení do systému";
+    constexpr float TEXT_WIDTH = 150.0f;
 
     ImVec2 center = ImGui::GetMainViewport ()->GetCenter ();
     ImGui::SetNextWindowPos (center, ImGuiCond_Appearing, ImVec2 (0.5f, 0.5f));
 
+    constexpr string_view popupTitle = "Přihlášení do systému";
     ImGui::OpenPopup (popupTitle.data ());
 
     if (ImGui::BeginPopupModal (popupTitle.data (), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        ImGui::Text ("Uživatelské jméno:");
-
-        if (ImGui::InputText ("##username", m_username, IM_ARRAYSIZE (m_username)))
+        if (ImGui::BeginTable ("loginTable", 3), ImGuiTableFlags_SizingFixedFit)
         {
-            m_loginFailed = false;
-        }
-        ImGui::Text ("Heslo:");
+            ImGui::TableSetupColumn ("", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn ("", ImGuiTableColumnFlags_WidthFixed, TEXT_WIDTH);
+            ImGui::TableSetupColumn ("", ImGuiTableColumnFlags_WidthFixed);
 
-        if (ImGui::InputText ("##password", m_password, IM_ARRAYSIZE (m_password), ImGuiInputTextFlags_Password))
-        {
-            m_loginFailed = false;
+            ImGui::TableNextRow ();
+            ImGui::TableNextColumn ();
+
+            ImGui::Text ("Uživatelské jméno:");
+
+            ImGui::TableNextColumn ();
+            ImGui::PushItemWidth (TEXT_WIDTH);
+
+            if (ImGui::InputText ("##username", m_username, IM_ARRAYSIZE (m_username)))
+            {
+                m_loginFailed = false;
+            }
+            ImGui::PopItemWidth ();
+
+            ImGui::TableNextColumn ();
+            details::HelpMarker ("Uživatelské jméno s oprávněním administrátora.");
+
+            ImGui::TableNextRow ();
+            ImGui::TableNextColumn ();
+
+            ImGui::Text ("Heslo:");
+
+            ImGui::TableNextColumn ();
+            ImGui::PushItemWidth (TEXT_WIDTH);
+
+            if (ImGui::InputText ("##password", m_password, IM_ARRAYSIZE (m_password), ImGuiInputTextFlags_Password))
+            {
+                m_loginFailed = false;
+            }
+            ImGui::PopItemWidth ();
+
+            ImGui::TableNextColumn ();
+            details::HelpMarker ("Heslo musí obsahovat čísla, velká a malá písmena.");
+
+            ImGui::EndTable ();
         }
         ImGui::Separator ();
 
@@ -155,7 +202,6 @@ IUiState* StateLogin::update (DataModel& model, const SdlCameraTexture* camera)
                 m_loginFailed = true;
             }
         }
-        ImGui::SetItemDefaultFocus ();
 
         if (m_loginFailed)
         {
@@ -217,9 +263,10 @@ IUiState* StateCamera::update (DataModel& model, const SdlCameraTexture* camera)
         float width = viewport->Size.x * (2.0f / 3.0f);
         float height = viewport->Size.y * (2.0f / 3.0f);
 
-        ImGui::SetNextWindowPos (ImVec2 ((viewport->Size.x - width) / 2.0f, (viewport->Size.y - height) / 2.0f),
-                                 ImGuiCond_Once);
         ImGui::SetNextWindowSize (ImVec2 (width, height), ImGuiCond_Once);
+
+        ImVec2 center = ImGui::GetMainViewport ()->GetCenter ();
+        ImGui::SetNextWindowPos (center, ImGuiCond_Appearing, ImVec2 (0.5f, 0.5f));
 
         ImGui::Begin ("Verifikace");
         ImGui::Text ("Usměj se :)");
