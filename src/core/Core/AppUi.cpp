@@ -49,6 +49,31 @@ private:
     bool m_loginFailed{};
 };
 
+///////////////////////////////////////////////////////////////////////////////
+// StateStart
+
+class StateStart : public IUiState
+{
+public:
+    /** {@inheritDoc} */
+    virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// StateCamera
+
+class StateCamera : public IUiState
+{
+public:
+    /** {@inheritDoc} */
+    virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
+// StateLogin
+
+
 IUiState* StateLogin::update (DataModel& model, const SdlCameraTexture* camera)
 {
     IUiState* state = nullptr;
@@ -82,7 +107,7 @@ IUiState* StateLogin::update (DataModel& model, const SdlCameraTexture* camera)
             if (isValid (m_username, m_password))
             {
                 ImGui::CloseCurrentPopup ();
-                state = new StateNull;
+                state = new StateCamera;
             }
             else
             {
@@ -108,13 +133,6 @@ bool StateLogin::isValid (string_view userName, string_view password) const
 
 ///////////////////////////////////////////////////////////////////////////////
 // StateStart
-
-class StateStart : public IUiState
-{
-public:
-    /** {@inheritDoc} */
-    virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
-};
 
 IUiState* StateStart::update (DataModel& /*model*/, const SdlCameraTexture* /*camera*/)
 {
@@ -147,19 +165,20 @@ IUiState* StateStart::update (DataModel& /*model*/, const SdlCameraTexture* /*ca
 ///////////////////////////////////////////////////////////////////////////////
 // StateCamera
 
-class StateCamera : public IUiState
-{
-public:
-    /** {@inheritDoc} */
-    virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
-};
-
 IUiState* StateCamera::update (DataModel& model, const SdlCameraTexture* camera)
 {
+    IUiState* state = nullptr;
+
     if (camera && camera->isValid ())
     {
-        ImGui::SetNextWindowPos (ImVec2 (0.0f, 0.0f), ImGuiCond_Once);
-        ImGui::SetNextWindowSize (ImVec2 (320.0f, 240.0f), ImGuiCond_Once);
+        ImGuiViewport* viewport = ImGui::GetMainViewport ();
+
+        float width = viewport->Size.x * (2.0f / 3.0f);
+        float height = viewport->Size.y * (2.0f / 3.0f);
+
+        ImGui::SetNextWindowPos (ImVec2 ((viewport->Size.x - width) / 2.0f, (viewport->Size.y - height) / 2.0f),
+                                 ImGuiCond_Once);
+        ImGui::SetNextWindowSize (ImVec2 (width, height), ImGuiCond_Once);
 
         ImGui::Begin ("Verifikace");
         ImGui::Text ("Usměj se :)");
@@ -183,9 +202,14 @@ IUiState* StateCamera::update (DataModel& model, const SdlCameraTexture* camera)
                       size,
                       ImVec2 (1, 0),
                       ImVec2 (0, 1));
+
+        if (ImGui::IsItemHovered () && ImGui::IsMouseDoubleClicked (ImGuiMouseButton_Left))
+        {
+            state = new StateNull;
+        }
         ImGui::End ();
     }
-    return nullptr;
+    return state;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -193,7 +217,6 @@ IUiState* StateCamera::update (DataModel& model, const SdlCameraTexture* camera)
 
 AppUi::AppUi ()
 {
-    m_states.emplace_back (new StateCamera);
     m_states.emplace_back (new StateStart);
 }
 
