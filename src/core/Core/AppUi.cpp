@@ -106,10 +106,13 @@ public:
     /** {@inheritDoc} */
     virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
 private:
+    bool isValid (string_view address, int port) const;
+
     bool m_isConnected;
     bool m_deviceActive;
     bool m_soundEnabled;
     bool m_ledEnabled;
+    bool m_loginFailed;
 };
 
 
@@ -253,7 +256,7 @@ IUiState* StateStart::update (DataModel& model, const SdlCameraTexture* /*camera
         ImGui::Text ("Zařízení aktivováno!\nPro deaktivaci se přihlašte.");
         ImGui::Separator ();
 
-        if (ImGui::Button ("OK", ImVec2 (120, 0)))
+        if (ImGui::Button ("OK", ImVec2 (-1, 30)))
         {
             model.startTime = ImGui::GetTime ();
             ImGui::CloseCurrentPopup ();
@@ -322,8 +325,9 @@ IUiState* StateCamera::update (DataModel& /*model*/, const SdlCameraTexture* cam
 StateSerial::StateSerial ()
     : m_isConnected {}
     , m_deviceActive {true}
-    , m_soundEnabled {true}
+    , m_soundEnabled {}
     , m_ledEnabled {}
+    , m_loginFailed {}
 {
 }
 
@@ -354,8 +358,11 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
 
             ImGui::TableNextColumn ();
             ImGui::SetNextItemWidth (-1.0f);
-            ImGui::InputText ("##Adresa", deviceAddress, IM_ARRAYSIZE (deviceAddress));
 
+            if (ImGui::InputText ("##Adresa", deviceAddress, IM_ARRAYSIZE (deviceAddress)))
+            {
+                m_loginFailed = false;
+            }
             ImGui::TableNextColumn ();
             details::HelpMarker ("Sem prijde napoveda.");
 
@@ -367,12 +374,13 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
 
             ImGui::TableNextColumn ();
             ImGui::SetNextItemWidth (-1.0f);
-            ImGui::InputInt ("##Port", &devicePort, 0, 0);
 
+            if (ImGui::InputInt ("##Port", &devicePort, 0, 0))
+            {
+                m_loginFailed = false;
+            }
             ImGui::TableNextColumn ();
             details::HelpMarker ("Sem prijde napoveda.");
-
-            ImGui::TableSetColumnIndex (2);
 
             ImGui::EndTable ();
         }
@@ -385,18 +393,31 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
     {
         if (ImGui::Button ("Připojit k zařízení", ImVec2 (-1, 30)))
         {
-            m_isConnected = true;
+            if (isValid (deviceAddress, devicePort))
+            {
+                m_isConnected = true;
+            }
+            else
+            {
+                m_loginFailed = true;
+            }
         }
     }
     else
     {
-        ImGui::PushStyleColor (ImGuiCol_Button, ImVec4 (0.6f, 0.1f, 0.1f, 1.0f)); // Červené tlačítko pro odpojení
+        ImGui::PushStyleColor (ImGuiCol_Button, ImVec4 (0.6f, 0.1f, 0.1f, 1.0f));
 
         if (ImGui::Button ("Odpojit", ImVec2 (-1, 30)))
         {
             m_isConnected = false;
         }
         ImGui::PopStyleColor ();
+    }
+
+    if (m_loginFailed)
+    {
+        ImGui::Spacing ();
+        ImGui::TextColored (ImVec4 (1, 0.3f, 0.3f, 1), "Neplatné přihlašovací údaje.");
     }
     ImGui::Separator ();
 
@@ -421,6 +442,11 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
     ImGui::End ();
 
     return nullptr;
+}
+
+bool StateSerial::isValid (string_view address, int port) const
+{
+    return address == "test" && port == 8080;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
