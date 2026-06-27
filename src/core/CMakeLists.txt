@@ -12,6 +12,8 @@ add_library(${NAME} STATIC
   "Core/EventBus.h"
   "Core/EventBusImpl.h"
   "Core/ImGuiPass.cpp"
+  "Core/Serialib.cpp"
+  "Core/Serialib.h"
   "Core/SdlContext.cpp"
   "Core/SdlContext.h"
   "Core/SdlEventTranslator.cpp"

@@ -1,5 +1,6 @@
 #include "AppUi.h"
 #include "SdlCameraTexture.h"
+#include "TraceLog/Log.hpp"
 
 #include "imgui.h"
 
@@ -22,6 +23,33 @@ namespace details
             ImGui::TextUnformatted (desc);
             ImGui::PopTextWrapPos ();
             ImGui::EndTooltip ();
+        }
+    }
+
+    void sendSerial (serialib* serial, const char* text)
+    {
+        char buffer [32] = {0};
+        serial->writeString (text);
+        serial->readString (buffer, '\n', 32, 2000);
+    }
+
+    void messageInfo (string_view popupTitle, string_view message)
+    {
+        // ImGui::OpenPopup (popupTitle.data ());
+
+        ImVec2 center = ImGui::GetMainViewport ()->GetCenter ();
+        ImGui::SetNextWindowPos (center, ImGuiCond_Appearing, ImVec2 (0.5f, 0.5f));
+
+        if (ImGui::BeginPopupModal (popupTitle.data (), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text (message.data ());
+            ImGui::Separator ();
+
+            if (ImGui::Button ("OK", ImVec2 (-1, 0)))
+            {
+                ImGui::CloseCurrentPopup ();
+            }
+            ImGui::EndPopup ();
         }
     }
 }
@@ -102,7 +130,7 @@ class StateSerial : public IUiState
 {
 public:
     /** Initialize members. */
-    StateSerial ();
+    StateSerial (serialib* serial);
     /** {@inheritDoc} */
     virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
 private:
@@ -112,7 +140,9 @@ private:
     bool m_deviceActive;
     bool m_soundEnabled;
     bool m_ledEnabled;
+    bool m_dispEnabled;
     bool m_loginFailed;
+    serialib* m_serial;
 };
 
 
@@ -208,6 +238,7 @@ IUiState* StateLogin::update (DataModel& /*model*/, const SdlCameraTexture* /*ca
             ImGui::EndTable ();
         }
         ImGui::Separator ();
+        ImGui::Spacing ();
 
         if (ImGui::Button ("Přihlásit se", ImVec2 (-1, 0)))
         {
@@ -256,7 +287,7 @@ IUiState* StateStart::update (DataModel& model, const SdlCameraTexture* /*camera
         ImGui::Text ("Zařízení aktivováno!\nPro deaktivaci se přihlašte.");
         ImGui::Separator ();
 
-        if (ImGui::Button ("OK", ImVec2 (-1, 30)))
+        if (ImGui::Button ("OK", ImVec2 (-1, 0)))
         {
             model.startTime = ImGui::GetTime ();
             ImGui::CloseCurrentPopup ();
@@ -295,7 +326,7 @@ IUiState* StateCamera::update (DataModel& /*model*/, const SdlCameraTexture* cam
         float texW = float (camera->getWidth ());
         float texH = float (camera->getHeight ());
 
-        float scale = std::min (available.x / texW, available.y / texH);
+        float scale = (std::min) (available.x / texW, available.y / texH);
         ImVec2 size = ImVec2 (texW * scale, texH * scale);
 
         ImVec2 cursor = ImGui::GetCursorPos ();
@@ -322,18 +353,20 @@ IUiState* StateCamera::update (DataModel& /*model*/, const SdlCameraTexture* cam
 ///////////////////////////////////////////////////////////////////////////////
 // StateSerial
 
-StateSerial::StateSerial ()
+StateSerial::StateSerial (serialib* serial)
     : m_isConnected {}
     , m_deviceActive {true}
     , m_soundEnabled {}
-    , m_ledEnabled {}
+    , m_ledEnabled {true}
+    , m_dispEnabled {}
     , m_loginFailed {}
+    , m_serial {serial}
 {
 }
 
 IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
 {
-    static char deviceAddress [128] = "192.168.1.50";
+    static char deviceAddress [128] = "test";
     static int devicePort = 8080;
 
     ImVec2 center = ImGui::GetMainViewport ()->GetCenter ();
@@ -387,15 +420,24 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
     }
     ImGui::EndDisabled ();
 
-    ImGui::Spacing ();
-
     if (!m_isConnected)
     {
-        if (ImGui::Button ("Připojit k zařízení", ImVec2 (-1, 30)))
+        if (ImGui::Button ("Připojit k zařízení", ImVec2 (-1, 0)))
         {
-            if (isValid (deviceAddress, devicePort))
+            m_isConnected = isValid (deviceAddress, devicePort);
+
+            if (m_isConnected)
             {
-                m_isConnected = true;
+                static bool first = true;
+
+                if (first)
+                {
+                    first = false;
+                    ImGui::OpenPopup ("Upozornění##1");
+
+                    details::sendSerial (m_serial, "TOGGLE");
+                    model.startTime = ImGui::GetTime () - 120.0;
+                }
             }
             else
             {
@@ -407,7 +449,7 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
     {
         ImGui::PushStyleColor (ImGuiCol_Button, ImVec4 (0.6f, 0.1f, 0.1f, 1.0f));
 
-        if (ImGui::Button ("Odpojit", ImVec2 (-1, 30)))
+        if (ImGui::Button ("Odpojit", ImVec2 (-1, 0)))
         {
             m_isConnected = false;
         }
@@ -425,22 +467,62 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
 
     ImGui::BeginDisabled (!m_isConnected);
     {
-        ImGui::Checkbox ("Zařízení aktivní", &m_deviceActive);
-
+        if (ImGui::Checkbox ("Zařízení aktivní", &m_deviceActive))
+        {
+            m_deviceActive = true;
+            ImGui::OpenPopup ("Upozornění##2");
+        }
         ImGui::Spacing ();
 
         ImGui::BeginDisabled (!m_deviceActive);
         {
-            ImGui::Checkbox ("Zapnout zvuk", &m_soundEnabled);
+            if (ImGui::Checkbox ("Zapnout zvuk", &m_soundEnabled))
+            {
+                if (m_soundEnabled)
+                {
+                    details::sendSerial (m_serial, "BEEP_ON");
+                }
+                else
+                {
+                    details::sendSerial (m_serial, "BEEP_OFF");
+                }
+            }
             ImGui::SameLine ();
-            ImGui::Checkbox ("Zapnout LED", &m_ledEnabled);
+
+            if (ImGui::Checkbox ("Zapnout LED", &m_ledEnabled))
+            {
+                if (m_ledEnabled)
+                {
+                    details::sendSerial (m_serial, "LEDS_ON");
+                }
+                else
+                {
+                    details::sendSerial (m_serial, "LEDS_OFF");
+                }
+            }
+            ImGui::SameLine ();
+
+            if (ImGui::Checkbox ("Zapnout Display", &m_dispEnabled))
+            {
+                if (m_dispEnabled)
+                {
+                    details::sendSerial (m_serial, "DISP_ON");
+                }
+                else
+                {
+                    details::sendSerial (m_serial, "DISP_OFF");
+                }
+            }
         }
         ImGui::EndDisabled ();
     }
+
     ImGui::EndDisabled ();
 
-    ImGui::End ();
+    details::messageInfo ("Upozornění##1", "Detekován podezřelý přístup.\nOdpočet nastaven na 2:00.");
+    details::messageInfo ("Upozornění##2", "Dalková deaktivace není možná.\nVypněte na zařízení.");
 
+    ImGui::End ();
     return nullptr;
 }
 
@@ -455,11 +537,21 @@ bool StateSerial::isValid (string_view address, int port) const
 AppUi::AppUi ()
 {
     m_states.emplace_back (new StateCounter);
-    m_states.emplace_back (new StateSerial);
+    m_states.emplace_back (new StateSerial (&m_serial));
     m_states.emplace_back (new StateStart);
+
+    char status = m_serial.openDevice ("COM4", 9600);
+
+    if (status != 1)
+    {
+        APP_ERROR ("Cannot open COM port");
+    }
 }
 
-AppUi::~AppUi () = default;
+AppUi::~AppUi ()
+{
+    m_serial.closeDevice ();
+}
 
 void AppUi::update (DataModel& model, const SdlCameraTexture* camera)
 {
@@ -467,20 +559,6 @@ void AppUi::update (DataModel& model, const SdlCameraTexture* camera)
 
     ImGui::DockSpaceOverViewport (0, ImGui::GetMainViewport (), dockspaceFlags);
 
-    if (ImGui::BeginMainMenuBar ())
-    {
-        if (ImGui::BeginMenu ("View"))
-        {
-            ImGui::MenuItem ("Demo", nullptr, &model.showDemo);
-            ImGui::EndMenu ();
-        }
-        ImGui::EndMainMenuBar ();
-    }
-
-    if (model.showDemo)
-    {
-        ImGui::ShowDemoWindow (&model.showDemo);
-    }
     vector<unique_ptr<IUiState> > nextStates;
     nextStates.reserve (m_states.size ());
 

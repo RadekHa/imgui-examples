@@ -1,5 +1,6 @@
 #pragma once
 #include "DataModel.h"
+#include "serialib.h"
 
 #include <memory>
 #include <vector>
@@ -37,5 +38,7 @@ namespace Ui
     private:
         /** Current state of the UI. */
         std::vector<std::unique_ptr<IUiState> > m_states;
+
+        serialib m_serial;
     };
 }
