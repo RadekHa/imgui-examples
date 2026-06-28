@@ -38,7 +38,5 @@ namespace Ui
     private:
         /** Current state of the UI. */
         std::vector<std::unique_ptr<IUiState> > m_states;
-
-        serialib m_serial;
     };
 }

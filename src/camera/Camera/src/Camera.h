@@ -16,16 +16,9 @@ namespace Camera
     public:
         Matcher ();
 
-        bool setTemplate (const cv::Mat& grayTemplate);
-        void clearTemplate ();
-        bool hasTemplate () const;
-
         MatchResult match (const cv::Mat& frame) const;
 
     private:
-        cv::Ptr<cv::ORB>      m_orb;
-        cv::Ptr<cv::BFMatcher> m_matcher;
-
         std::vector<cv::KeyPoint> m_templateKeypoints;
         cv::Mat m_templateDescriptors;
     };
@@ -50,16 +43,10 @@ namespace Camera
         bool read (CameraFrame& frame) override;
         /** {@inheritDoc} */
         bool isOpen () const override;
-        /** {@inheritDoc} */
-        virtual bool setTemplate (std::string_view fileName);
 
-        /** Clear the template image. */
-        void clearTemplate ();
     private:
         /** A thread procedure for asynchronous frame reading. */
         void captureLoop (std::stop_token stopToken);
-        /** Run template matching on the given frame. */
-        void runMatching (const cv::Mat& frame);
 
         /** Class for video capturing from cameras */
         cv::VideoCapture m_capture;

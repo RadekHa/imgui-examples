@@ -27,106 +27,58 @@ unique_ptr<ICamera> Camera::createCamera (int cameraIndex)
 // Matcher
 
 Matcher::Matcher ()
-    : m_orb {cv::ORB::create (2000, 1.2f, 8, 31, 0, 2, cv::ORB::HARRIS_SCORE, 31, 7)}
-    , m_matcher {cv::BFMatcher::create (cv::NORM_HAMMING)}
 {
-}
-
-bool Matcher::setTemplate (const cv::Mat& grayTemplate)
-{
-    m_templateKeypoints.clear ();
-    m_templateDescriptors = {};
-
-    m_orb->detectAndCompute (grayTemplate, cv::noArray (), m_templateKeypoints, m_templateDescriptors);
-
-    if (m_templateDescriptors.empty ())
-    {
-        APP_WARN ("Matcher: ORB no key point found");
-    }
-    else
-    {
-        APP_INFO ("Matcher: template set, keypoints: {}", m_templateKeypoints.size ());
-    }
-    return hasTemplate ();
-}
-
-void Matcher::clearTemplate ()
-{
-    m_templateKeypoints.clear ();
-    m_templateDescriptors = {};
-    APP_INFO ("Matcher: template cleared");
-}
-
-bool Matcher::hasTemplate () const
-{
-    return !m_templateDescriptors.empty ();
 }
 
 MatchResult Matcher::match (const cv::Mat& frame) const
 {
+    cv::Mat hsv, mask;
+    cv::cvtColor (frame, hsv, cv::COLOR_BGR2HSV);
+
+    cv::Scalar lower (20, 100, 100);
+    cv::Scalar upper (35, 255, 255);
+    cv::inRange (hsv, lower, upper, mask);
+
+    cv::Mat blurred;
+    cv::GaussianBlur (mask, blurred, cv::Size (9, 9), 2);
+
+    int minRadius = frame.cols / 4;
+    int maxRadius = frame.cols;
+
+    vector<cv::Vec3f> circles;
+    cv::HoughCircles (blurred, circles, cv::HOUGH_GRADIENT, 1,
+                      mask.rows / 8,
+                      100, 30,
+                      minRadius, maxRadius);
+
+
     MatchResult result;
 
-    if (!hasTemplate ())
+    if (!circles.empty ())
     {
-        return result;
-    }
-    cv::Mat grayFrame;
-    cv::cvtColor (frame, grayFrame, cv::COLOR_BGR2GRAY);
-
-    vector<cv::KeyPoint> frameKeypoints;
-    cv::Mat frameDescriptors;
-    m_orb->detectAndCompute (grayFrame, cv::noArray (), frameKeypoints, frameDescriptors);
-
-    if (frameDescriptors.empty ())
-    {
-        return result;
-    }
-    vector<cv::DMatch> matches;
-    m_matcher->match (m_templateDescriptors, frameDescriptors, matches);
-
-    vector<cv::DMatch> goodMatches;
-    constexpr float distanceThreshold = 35.0f;
-
-    for (const auto& m : matches)
-    {
-        if (m.distance < distanceThreshold)
+        for (auto c : circles)
         {
-            goodMatches.push_back (m);
-        }
-    }
-    result.goodMatches = static_cast<int> (goodMatches.size ());
+            cv::Point center (cvRound (c [0]), cvRound (c [1]));
+            int radius = cvRound (c [2]);
 
-    constexpr size_t minRequiredMatches = 15;
+            cv::Mat circleMask = cv::Mat::zeros (mask.size (), CV_8U);
+            cv::circle (circleMask, center, radius, 255, -1);
 
-    APP_INFO ("Matcher: goodMatches: {}", result.goodMatches);
-    cv::drawKeypoints (frame, frameKeypoints, frame, cv::Scalar (0, 255, 0));
+            int total = cv::countNonZero (circleMask);
+            int yellow = cv::countNonZero (mask & circleMask);
+            float ratio = static_cast<float> (yellow) / total;
 
-    if (goodMatches.size () >= minRequiredMatches)
-    {
-        vector<cv::Point2f> srcPoints, dstPoints;
+            APP_INFO ("yellow ratio: {:.2f} /{}", ratio, radius);
 
-        for (const auto& m : goodMatches)
-        {
-            srcPoints.push_back (m_templateKeypoints [m.queryIdx].pt);
-            dstPoints.push_back (frameKeypoints [m.trainIdx].pt);
-        }
-        cv::Mat H = cv::findHomography (srcPoints, dstPoints, cv::RANSAC, 5.0);
+            constexpr float minYellowRatio = 0.6f;
 
-        if (!H.empty ())
-        {
-            double angleRad = atan2 (H.at<double> (1, 0), H.at<double> (0, 0));
-            double angleDeg = angleRad * (180.0 / CV_PI);
+            cv::circle (frame, center, radius, cv::Scalar (0, 255, 0), 2);
+            cv::circle (frame, center, 3, cv::Scalar (0, 0, 255), -1);
 
-            if (angleDeg < 0.0)
+            if (ratio > minYellowRatio)
             {
-                angleDeg += 360.0;
+                result.found = true;
             }
-            constexpr double maxAllowedAngle = 45.0;
-
-            result.angleDeg = angleDeg;
-            result.found = (angleDeg <= maxAllowedAngle) || (angleDeg >= (360.0 - maxAllowedAngle));
-
-            APP_INFO ("Matcher: angleDeg: {:.1f}, found: {}", angleDeg, result.found);
         }
     }
     return result;
@@ -240,39 +192,6 @@ bool OpenCVCamera::isOpen () const
     return m_capture.isOpened ();
 }
 
-bool OpenCVCamera::setTemplate (string_view fileName)
-{
-    bool result = false;
-
-    unique_ptr<IImageData> imgData = loadImage (fileName, 3);
-
-    if (imgData)
-    {
-        cv::Mat matOrig (imgData->getHeight (),
-                         imgData->getWidth (), CV_8UC3, const_cast<unsigned char*> (imgData->getPixels ()));
-        cv::Mat matGrey;
-        cv::cvtColor (matOrig.clone (), matGrey, cv::COLOR_BGR2GRAY);
-
-        cv::flip (matGrey, matGrey, 1);
-
-        {
-            lock_guard lock{m_templateMutex};
-            result = m_matcher.setTemplate (matGrey);
-        }
-    }
-    return result;
-}
-
-void OpenCVCamera::clearTemplate ()
-{
-    {
-        lock_guard lock{m_templateMutex};
-        m_matcher.clearTemplate ();
-    }
-
-    APP_INFO ("Template cleared");
-}
-
 void OpenCVCamera::captureLoop (stop_token stopToken)
 {
     try
@@ -286,11 +205,7 @@ void OpenCVCamera::captureLoop (stop_token stopToken)
                 this_thread::sleep_for (chrono::milliseconds (10));
                 continue;
             }
-            MatchResult result;
-            {
-                lock_guard lock{m_templateMutex};
-                result = m_matcher.match (frame);
-            }
+            MatchResult result = m_matcher.match (frame);
 
             {
                 lock_guard lock{m_mutex};

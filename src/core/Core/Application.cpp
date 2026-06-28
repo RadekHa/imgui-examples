@@ -21,14 +21,21 @@ Application::Application (const string& title, const IPathService* paths)
 {
     ZoneScoped;
 
-    m_camera->setTemplate (paths->getResourcePath ("images/smile.png"));
-
     init ();
+
+    char status = m_model.serial.openDevice ("COM4", 9600);
+
+    if (status != 1)
+    {
+        APP_ERROR ("Cannot open COM port");
+    }
 }
 
 Application::~Application ()
 {
     ZoneScoped;
+
+    m_model.serial.closeDevice ();
 }
 
 ExitStatus Application::run ()
@@ -52,9 +59,14 @@ ExitStatus Application::run ()
     {
         ZoneScopedN ("MainLoop");
 
-        if (m_camera && m_camera->read (frame, matchResult))
+        if (!matchResult.found && m_camera && m_camera->read (frame, matchResult))
         {
             camTexture.update (frame);
+
+            if (matchResult.found)
+            {
+                m_model.isSmile = matchResult.found;
+            }
         }
         FrameContext frameContext;
 

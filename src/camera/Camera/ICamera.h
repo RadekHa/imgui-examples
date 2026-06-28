@@ -36,8 +36,6 @@ namespace Camera
         virtual bool read (CameraFrame& frame, MatchResult& matchResult) = 0;
         /** Return true if the camera is open. */
         virtual bool isOpen () const = 0;
-
-        virtual bool setTemplate (std::string_view fileName) = 0;
     };
 
     /** Factory function to create an instance of ICamera. */

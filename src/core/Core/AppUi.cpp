@@ -130,7 +130,7 @@ class StateSerial : public IUiState
 {
 public:
     /** Initialize members. */
-    StateSerial (serialib* serial);
+    StateSerial ();
     /** {@inheritDoc} */
     virtual IUiState* update (DataModel& model, const SdlCameraTexture* camera) override;
 private:
@@ -142,7 +142,6 @@ private:
     bool m_ledEnabled;
     bool m_dispEnabled;
     bool m_loginFailed;
-    serialib* m_serial;
 };
 
 
@@ -299,7 +298,7 @@ IUiState* StateStart::update (DataModel& model, const SdlCameraTexture* /*camera
 ///////////////////////////////////////////////////////////////////////////////
 // StateCamera
 
-IUiState* StateCamera::update (DataModel& /*model*/, const SdlCameraTexture* camera)
+IUiState* StateCamera::update (DataModel& model, const SdlCameraTexture* camera)
 {
     IUiState* state = nullptr;
 
@@ -338,9 +337,9 @@ IUiState* StateCamera::update (DataModel& /*model*/, const SdlCameraTexture* cam
                       ImVec2 (1, 0),
                       ImVec2 (0, 1));
 
-        if (ImGui::IsItemHovered () && ImGui::IsMouseDoubleClicked (ImGuiMouseButton_Left))
+        if (model.isSmile || (ImGui::IsItemHovered () && ImGui::IsMouseDoubleClicked (ImGuiMouseButton_Left)))
         {
-            state = new StateNull;
+            state = new StateSerial;
         }
         ImGui::End ();
     }
@@ -350,14 +349,13 @@ IUiState* StateCamera::update (DataModel& /*model*/, const SdlCameraTexture* cam
 ///////////////////////////////////////////////////////////////////////////////
 // StateSerial
 
-StateSerial::StateSerial (serialib* serial)
+StateSerial::StateSerial ()
     : m_isConnected {}
     , m_deviceActive {true}
     , m_soundEnabled {}
     , m_ledEnabled {true}
     , m_dispEnabled {}
     , m_loginFailed {}
-    , m_serial {serial}
 {
 }
 
@@ -394,7 +392,7 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
                 m_loginFailed = false;
             }
             ImGui::TableNextColumn ();
-            details::HelpMarker ("Sem prijde napoveda.");
+            details::HelpMarker ("Doktor + Milášek + Mustang = ?");
 
             ImGui::TableNextRow ();
 
@@ -410,7 +408,7 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
                 m_loginFailed = false;
             }
             ImGui::TableNextColumn ();
-            details::HelpMarker ("Sem prijde napoveda.");
+            details::HelpMarker ("Co si zaházet šipky?");
 
             ImGui::EndTable ();
         }
@@ -432,7 +430,7 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
                     first = false;
                     ImGui::OpenPopup ("Upozornění##1");
 
-                    details::sendSerial (m_serial, "TOGGLE");
+                    details::sendSerial (&model.serial, "TOGGLE");
                     model.startTime = ImGui::GetTime () + 120.0;
                 }
             }
@@ -477,11 +475,11 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
             {
                 if (m_soundEnabled)
                 {
-                    details::sendSerial (m_serial, "BEEP_ON");
+                    details::sendSerial (&model.serial, "BEEP_ON");
                 }
                 else
                 {
-                    details::sendSerial (m_serial, "BEEP_OFF");
+                    details::sendSerial (&model.serial, "BEEP_OFF");
                 }
             }
             ImGui::SameLine ();
@@ -490,11 +488,11 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
             {
                 if (m_ledEnabled)
                 {
-                    details::sendSerial (m_serial, "LEDS_ON");
+                    details::sendSerial (&model.serial, "LEDS_ON");
                 }
                 else
                 {
-                    details::sendSerial (m_serial, "LEDS_OFF");
+                    details::sendSerial (&model.serial, "LEDS_OFF");
                 }
             }
             ImGui::SameLine ();
@@ -503,11 +501,11 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
             {
                 if (m_dispEnabled)
                 {
-                    details::sendSerial (m_serial, "DISP_ON");
+                    details::sendSerial (&model.serial, "DISP_ON");
                 }
                 else
                 {
-                    details::sendSerial (m_serial, "DISP_OFF");
+                    details::sendSerial (&model.serial, "DISP_OFF");
                 }
             }
         }
@@ -534,20 +532,11 @@ bool StateSerial::isValid (string_view address, int port) const
 AppUi::AppUi ()
 {
     m_states.emplace_back (new StateCounter);
-    m_states.emplace_back (new StateSerial (&m_serial));
     m_states.emplace_back (new StateStart);
-
-    char status = m_serial.openDevice ("COM4", 9600);
-
-    if (status != 1)
-    {
-        APP_ERROR ("Cannot open COM port");
-    }
 }
 
 AppUi::~AppUi ()
 {
-    m_serial.closeDevice ();
 }
 
 void AppUi::update (DataModel& model, const SdlCameraTexture* camera)
