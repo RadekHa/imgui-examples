@@ -361,8 +361,8 @@ StateSerial::StateSerial ()
 
 IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
 {
-    static char deviceAddress [128] = "test";
-    static int devicePort = 8080;
+    static char deviceAddress [128] = "";
+    static int devicePort = 0;
 
     ImVec2 center = ImGui::GetMainViewport ()->GetCenter ();
     ImGui::SetNextWindowPos (center, ImGuiCond_Appearing, ImVec2 (0.5f, 0.5f));
@@ -392,7 +392,7 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
                 m_loginFailed = false;
             }
             ImGui::TableNextColumn ();
-            details::HelpMarker ("Doktor + Milášek + Mustang = ?");
+            details::HelpMarker ("Plačící anděl + Glum + Mustang = ?");
 
             ImGui::TableNextRow ();
 
@@ -430,7 +430,7 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
                     first = false;
                     ImGui::OpenPopup ("Upozornění##1");
 
-                    details::sendSerial (&model.serial, "TOGGLE");
+                    details::sendSerial (&model.serial, "TOGGLE\n");
                     model.startTime = ImGui::GetTime () + 120.0;
                 }
             }
@@ -475,11 +475,11 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
             {
                 if (m_soundEnabled)
                 {
-                    details::sendSerial (&model.serial, "BEEP_ON");
+                    details::sendSerial (&model.serial, "BEEP_ON\n");
                 }
                 else
                 {
-                    details::sendSerial (&model.serial, "BEEP_OFF");
+                    details::sendSerial (&model.serial, "BEEP_OFF\n");
                 }
             }
             ImGui::SameLine ();
@@ -488,11 +488,11 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
             {
                 if (m_ledEnabled)
                 {
-                    details::sendSerial (&model.serial, "LEDS_ON");
+                    details::sendSerial (&model.serial, "LEDS_ON\n");
                 }
                 else
                 {
-                    details::sendSerial (&model.serial, "LEDS_OFF");
+                    details::sendSerial (&model.serial, "LEDS_OFF\n");
                 }
             }
             ImGui::SameLine ();
@@ -501,11 +501,11 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
             {
                 if (m_dispEnabled)
                 {
-                    details::sendSerial (&model.serial, "DISP_ON");
+                    details::sendSerial (&model.serial, "DISP_ON\n");
                 }
                 else
                 {
-                    details::sendSerial (&model.serial, "DISP_OFF");
+                    details::sendSerial (&model.serial, "DISP_OFF\n");
                 }
             }
         }
@@ -523,7 +523,7 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
 
 bool StateSerial::isValid (string_view address, int port) const
 {
-    return address == "test" && port == 8080;
+    return (address == "A3B0C9" || address == "a3b0c9") && port == 42;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
