@@ -156,13 +156,10 @@ IUiState* StateCounter::update (DataModel& model, const SdlCameraTexture* /*came
     int min = 60;
     int sec = 0;
 
-    if (model.startTime > 0)
+    auto rest = static_cast<int> (model.startTime - ImGui::GetTime ());
+
+    if (rest > 0)
     {
-        auto currentTime = ImGui::GetTime ();
-        auto runTime = currentTime - model.startTime;
-
-        int rest = max (0, 60 * 60 - static_cast<int> (runTime));
-
         min = rest / 60;
         sec = rest % 60;
     }
@@ -233,7 +230,7 @@ IUiState* StateLogin::update (DataModel& /*model*/, const SdlCameraTexture* /*ca
             ImGui::PopItemWidth ();
 
             ImGui::TableNextColumn ();
-            details::HelpMarker ("Heslo musí obsahovat čísla, velká a malá písmena.");
+            details::HelpMarker ("Vaše heslo.");
 
             ImGui::EndTable ();
         }
@@ -265,7 +262,7 @@ IUiState* StateLogin::update (DataModel& /*model*/, const SdlCameraTexture* /*ca
 
 bool StateLogin::isValid (string_view userName, string_view password) const
 {
-    return userName == "user" && password == "pwd";
+    return userName == "MATRIX" && password == "START5";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -289,7 +286,7 @@ IUiState* StateStart::update (DataModel& model, const SdlCameraTexture* /*camera
 
         if (ImGui::Button ("OK", ImVec2 (-1, 0)))
         {
-            model.startTime = ImGui::GetTime ();
+            model.startTime = ImGui::GetTime () + 60 * 60;
             ImGui::CloseCurrentPopup ();
 
             state = new StateLogin;
@@ -319,7 +316,7 @@ IUiState* StateCamera::update (DataModel& /*model*/, const SdlCameraTexture* cam
         ImGui::SetNextWindowPos (center, ImGuiCond_Appearing, ImVec2 (0.5f, 0.5f));
 
         ImGui::Begin ("Verifikace");
-        ImGui::Text ("Usměj se :)");
+        details::HelpMarker ("Usměj se :)");
 
         ImVec2 available = ImGui::GetContentRegionAvail ();
 
@@ -436,7 +433,7 @@ IUiState* StateSerial::update (DataModel& model, const SdlCameraTexture* camera)
                     ImGui::OpenPopup ("Upozornění##1");
 
                     details::sendSerial (m_serial, "TOGGLE");
-                    model.startTime = ImGui::GetTime () - 120.0;
+                    model.startTime = ImGui::GetTime () + 120.0;
                 }
             }
             else
