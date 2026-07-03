@@ -35,22 +35,24 @@ MatchResult Matcher::match (const cv::Mat& frame) const
     cv::Mat hsv, mask;
     cv::cvtColor (frame, hsv, cv::COLOR_BGR2HSV);
 
-    cv::Scalar lower (20, 100, 100);
-    cv::Scalar upper (35, 255, 255);
+    // H=22 odřízne lidskou kůži, ale vezme žlutou. V=60 pobere i stíny z tmavé kamery.
+    cv::Scalar lower (22, 60, 45);
+    cv::Scalar upper (38, 255, 255);
     cv::inRange (hsv, lower, upper, mask);
 
-    cv::Mat blurred;
-    cv::GaussianBlur (mask, blurred, cv::Size (9, 9), 2);
+    cv::Mat gray, blurred;
+    cv::cvtColor (frame, gray, cv::COLOR_BGR2GRAY);
+    cv::GaussianBlur (gray, blurred, cv::Size (9, 9), 2);
 
     int minRadius = frame.cols / 4;
     int maxRadius = frame.cols;
 
     vector<cv::Vec3f> circles;
+    // Zpřísněn parametr citlivosti na tvar z 30 na 45
     cv::HoughCircles (blurred, circles, cv::HOUGH_GRADIENT, 1,
                       mask.rows / 8,
-                      100, 30,
+                      100, 45, 
                       minRadius, maxRadius);
-
 
     MatchResult result;
 
@@ -70,7 +72,8 @@ MatchResult Matcher::match (const cv::Mat& frame) const
 
             APP_INFO ("yellow ratio: {:.2f} /{}", ratio, radius);
 
-            constexpr float minYellowRatio = 0.6f;
+            // Kompromis: 50% plochy musí být čistě žlutá
+            constexpr float minYellowRatio = 0.5f; 
 
             cv::circle (frame, center, radius, cv::Scalar (0, 255, 0), 2);
             cv::circle (frame, center, 3, cv::Scalar (0, 0, 255), -1);
@@ -133,8 +136,8 @@ void OpenCVCamera::close ()
     }
     {
         lock_guard lock{m_mutex};
-        m_backBuffer = {};
-        m_frontBuffer = {};
+        m_backBuffer.release();
+        m_frontBuffer.release();
         m_isNewFrame = false;
         m_matchResult = {};
     }

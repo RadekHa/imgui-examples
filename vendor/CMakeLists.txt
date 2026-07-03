@@ -45,6 +45,7 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/opencv/opencv.git
     GIT_TAG        5.0.0
     GIT_SHALLOW    TRUE
+    SYSTEM
 )
 
 # Settings

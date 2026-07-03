@@ -23,7 +23,7 @@ Application::Application (const string& title, const IPathService* paths)
 
     init ();
 
-    char status = m_model.serial.openDevice ("COM4", 9600);
+    char status = m_model.serial.openDevice ("/dev/ttyUSB0", 9600);
 
     if (status != 1)
     {
