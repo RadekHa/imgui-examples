@@ -1,5 +1,5 @@
 #pragma once
-#include "Ui/ImageInfo.h"
+#include "Types/ImageInfo.h"
 
 namespace App
 {

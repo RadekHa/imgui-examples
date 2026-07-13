@@ -1,5 +1,5 @@
 #pragma once
-#include "DataModel.h"
+#include "Types/DataModel.h"
 #include "EventBus.h"
 #include "ImGuiPass.h"
 #include "IPathService.h"

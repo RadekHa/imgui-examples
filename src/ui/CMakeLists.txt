@@ -11,10 +11,10 @@ add_library(${NAME} STATIC
 
 target_include_directories(${NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Ui/src)
-target_include_directories(${NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src/core)
 
 target_compile_features(${NAME} PRIVATE cxx_std_20)
 
 target_link_libraries(${NAME}
+  PUBLIC Types
   PRIVATE project_warnings imgui TraceLog
 )
