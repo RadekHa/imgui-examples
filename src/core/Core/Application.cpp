@@ -5,6 +5,8 @@
 #include "SdlCameraTexture.h"
 #include "TraceLog/Log.hpp"
 #include "TraceLog/Tracy.hpp"
+#include "Ui/AppUi.h"
+#include "Ui/CameraInfo.h"
 
 using namespace App;
 using namespace Camera;
@@ -18,6 +20,7 @@ Application::Application (const string& title, const IPathService* paths)
     , m_window (title)
     , m_renderer (m_window.native (), paths)
     , m_imgui (m_window.native (), m_renderer.native (), paths)
+    , m_ui {std::make_unique<Ui::AppUi> ()}
 {
     ZoneScoped;
     init ();
@@ -66,7 +69,12 @@ ExitStatus Application::run ()
 
         if (!m_isMinimized)
         {
-            m_ui.update (m_model, &camTexture);
+            Ui::CameraInfo cameraInfo;
+            if (camTexture.isValid ())
+            {
+                cameraInfo = { camTexture.getImguiTextureId (), camTexture.getWidth (), camTexture.getHeight (), true };
+            }
+            m_ui->update (m_model.showDemo, &cameraInfo);
             m_renderer.update (m_model);
         }
         m_imgui.endFrame ();

@@ -6,7 +6,6 @@ add_library(${NAME} STATIC
   "Core/AppEvents.h"
   "Core/Application.cpp"
   "Core/Application.hpp"
-  "Core/AppUi.cpp"
   "Core/DpiHandler.cpp"
   "Core/DpiHandler.h"
   "Core/EventBus.h"
@@ -28,7 +27,7 @@ target_include_directories(${NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(${NAME} PRIVATE cxx_std_20)
 
 target_link_libraries(${NAME}
-  PRIVATE project_warnings
+  PRIVATE project_warnings Ui
   PUBLIC TraceLog Image SDL2::SDL2 imgui Settings Camera)
 
 
