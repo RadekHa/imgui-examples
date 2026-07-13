@@ -1,9 +1,5 @@
 #pragma once
-
-namespace App
-{
-    struct DataModel;
-}
+#include "Types/DataModel.h"
 
 namespace Ui
 {

@@ -4,7 +4,6 @@ include(${PROJECT_SOURCE_DIR}/cmake/StaticAnalyzers.cmake)
 
 add_library(${NAME} STATIC
   "Ui/IAppUi.h"
-  "Ui/ImageInfo.h"
   "Ui/src/IUiState.h"
   "Ui/src/AppUi.h"
   "Ui/src/AppUi.cpp"
