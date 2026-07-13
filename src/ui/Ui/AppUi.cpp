@@ -1,9 +1,11 @@
 #include "Ui/AppUi.h"
+#include "Core/DataModel.h"
 
 #include "imgui.h"
 
 #include <string_view>
 
+using namespace App;
 using namespace std;
 using namespace Ui;
 
@@ -16,7 +18,7 @@ class StateNull : public IUiState
 {
 public:
     /** {@inheritDoc} */
-    virtual IUiState* update (bool& showDemo, const CameraInfo* camera) override
+    virtual IUiState* update (App::DataModel& model) override
     {
         return nullptr;
     }
@@ -32,7 +34,7 @@ class StateLogin : public IUiState
 public:
 
     /** {@inheritDoc} */
-    virtual IUiState* update (bool& showDemo, const CameraInfo* camera) override;
+    virtual IUiState* update (App::DataModel& model) override;
 
 private:
     /** Check if the login is correct. */
@@ -46,7 +48,7 @@ private:
     bool m_loginFailed{};
 };
 
-IUiState* StateLogin::update (bool& showDemo, const CameraInfo* camera)
+IUiState* StateLogin::update (App::DataModel& model)
 {
     IUiState* state = nullptr;
 
@@ -110,10 +112,10 @@ class StateStart : public IUiState
 {
 public:
     /** {@inheritDoc} */
-    virtual IUiState* update (bool& showDemo, const CameraInfo* camera) override;
+    virtual IUiState* update (App::DataModel& model) override;
 };
 
-IUiState* StateStart::update (bool& showDemo, const CameraInfo* camera)
+IUiState* StateStart::update (App::DataModel& model)
 {
     IUiState* state = nullptr;
 
@@ -149,7 +151,7 @@ AppUi::AppUi ()
 
 AppUi::~AppUi () = default;
 
-void AppUi::update (bool& showDemo, const CameraInfo* camera)
+void AppUi::update (App::DataModel& model)
 {
     ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
 
@@ -159,25 +161,25 @@ void AppUi::update (bool& showDemo, const CameraInfo* camera)
     {
         if (ImGui::BeginMenu ("View"))
         {
-            ImGui::MenuItem ("Demo", nullptr, &showDemo);
+            ImGui::MenuItem ("Demo", nullptr, &model.showDemo);
             ImGui::EndMenu ();
         }
         ImGui::EndMainMenuBar ();
     }
 
-    if (showDemo)
+    if (model.showDemo)
     {
-        ImGui::ShowDemoWindow (&showDemo);
+        ImGui::ShowDemoWindow (&model.showDemo);
     }
 
-    if (camera && camera->valid)
+    if (model.camera.valid)
     {
         ImGui::Begin ("Camera");
 
         ImVec2 available = ImGui::GetContentRegionAvail ();
 
-        float texW = float (camera->width);
-        float texH = float (camera->height);
+        float texW = float (model.camera.width);
+        float texH = float (model.camera.height);
 
         float scale = std::min (available.x / texW, available.y / texH);
         ImVec2 size = ImVec2 (texW * scale, texH * scale);
@@ -189,13 +191,13 @@ void AppUi::update (bool& showDemo, const CameraInfo* camera)
 
         ImGui::SetCursorPos (pos);
 
-        ImGui::Image (camera->textureId,
+        ImGui::Image (model.camera.textureId,
                       size,
                       ImVec2 (1, 0),
                       ImVec2 (0, 1));
         ImGui::End ();
     }
-    IUiState* state = m_state->update (showDemo, camera);
+    IUiState* state = m_state->update (model);
 
     if (state != nullptr)
     {
