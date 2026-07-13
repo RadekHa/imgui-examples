@@ -1,19 +1,15 @@
 #pragma once
-#include "Types/DataModel.h"
 #include "EventBus.h"
-#include "ImGuiPass.h"
 #include "IPathService.h"
+#include "ImGuiPass.h"
 #include "SdlEventTranslator.h"
 #include "SdlRenderer.h"
 #include "SdlWindow.h"
+#include "Types/DataModel.h"
+#include "Ui/IAppUi.h"
 
 #include <memory>
 #include <string>
-
-namespace Ui
-{
-    struct IAppUi;
-}
 
 namespace App
 {

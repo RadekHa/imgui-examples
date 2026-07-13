@@ -3,9 +3,9 @@
 #include "ImGuiPass.h"
 #include "TraceLog/Log.hpp"
 
+#include <SDL_events.h>
 #include <backends/imgui_impl_sdl2.h>
 #include <backends/imgui_impl_sdlrenderer2.h>
-#include <SDL_events.h>
 
 #include <stdexcept>
 
