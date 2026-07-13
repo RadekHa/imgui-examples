@@ -12,7 +12,7 @@
 
 namespace Ui
 {
-    class AppUi;
+    struct IAppUi;
 }
 
 namespace App
@@ -73,6 +73,6 @@ namespace App
         /** The SDL event translator for processing SDL events and translating them into application events. */
         SdlEventTranslator m_eventTranslator;
         /** The user interface for the application. */
-        std::unique_ptr<Ui::AppUi> m_ui;
+        std::unique_ptr<Ui::IAppUi> m_ui;
     };
 }

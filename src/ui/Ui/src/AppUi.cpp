@@ -1,4 +1,4 @@
-#include "Ui/AppUi.h"
+#include "AppUi.h"
 #include "Core/DataModel.h"
 
 #include "imgui.h"
@@ -150,6 +150,14 @@ AppUi::AppUi ()
 }
 
 AppUi::~AppUi () = default;
+
+namespace Ui
+{
+    IAppUi* createAppUi ()
+    {
+        return new AppUi;
+    }
+}
 
 void AppUi::update (App::DataModel& model)
 {

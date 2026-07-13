@@ -5,7 +5,7 @@
 #include "SdlCameraTexture.h"
 #include "TraceLog/Log.hpp"
 #include "TraceLog/Tracy.hpp"
-#include "Ui/AppUi.h"
+#include "Ui/IAppUi.h"
 
 using namespace App;
 using namespace Camera;
@@ -19,7 +19,7 @@ Application::Application (const string& title, const IPathService* paths)
     , m_window (title)
     , m_renderer (m_window.native (), paths)
     , m_imgui (m_window.native (), m_renderer.native (), paths)
-    , m_ui {std::make_unique<Ui::AppUi> ()}
+    , m_ui {Ui::createAppUi ()}
 {
     ZoneScoped;
     init ();
