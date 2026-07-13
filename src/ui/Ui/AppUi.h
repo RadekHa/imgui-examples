@@ -1,7 +1,12 @@
 #pragma once
-#include "CameraInfo.h"
+#include "ImageInfo.h"
 
 #include <memory>
+
+namespace App
+{
+    struct DataModel;
+}
 
 namespace Ui
 {
@@ -12,7 +17,7 @@ namespace Ui
         /** Virtual destructor to allow proper cleanup of derived classes. */
         virtual ~IUiState () = default;
         /** Update UI elements. */
-        virtual IUiState* update (bool& showDemo, const CameraInfo* camera) = 0;
+        virtual IUiState* update (App::DataModel& model) = 0;
     };
 
     /** User Interface for the Application */
@@ -25,7 +30,7 @@ namespace Ui
         ~AppUi ();
 
         /** Updates the UI based on the given data model. */
-        void update (bool& showDemo, const CameraInfo* camera);
+        void update (App::DataModel& model);
 
     private:
         /** Current state of the UI. */

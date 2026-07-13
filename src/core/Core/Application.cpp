@@ -6,7 +6,6 @@
 #include "TraceLog/Log.hpp"
 #include "TraceLog/Tracy.hpp"
 #include "Ui/AppUi.h"
-#include "Ui/CameraInfo.h"
 
 using namespace App;
 using namespace Camera;
@@ -69,12 +68,15 @@ ExitStatus Application::run ()
 
         if (!m_isMinimized)
         {
-            Ui::CameraInfo cameraInfo;
             if (camTexture.isValid ())
             {
-                cameraInfo = { camTexture.getImguiTextureId (), camTexture.getWidth (), camTexture.getHeight (), true };
+                m_model.camera = Ui::ImageInfo{ camTexture.getImguiTextureId (), camTexture.getWidth (), camTexture.getHeight (), true };
             }
-            m_ui->update (m_model.showDemo, &cameraInfo);
+            else
+            {
+                m_model.camera = Ui::ImageInfo{};
+            }
+            m_ui->update (m_model);
             m_renderer.update (m_model);
         }
         m_imgui.endFrame ();

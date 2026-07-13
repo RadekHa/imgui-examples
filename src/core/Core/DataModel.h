@@ -1,4 +1,5 @@
 #pragma once
+#include "Ui/ImageInfo.h"
 
 namespace App
 {
@@ -7,5 +8,7 @@ namespace App
     {
         /** Flag indicating whether to show the ImGui demo window. */
         bool showDemo{true};
+        /** Camera frame information for UI rendering. */
+        Ui::ImageInfo camera{};
     };
 }
