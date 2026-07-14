@@ -5,6 +5,7 @@
 #include "SdlCameraTexture.h"
 #include "TraceLog/Log.hpp"
 #include "TraceLog/Tracy.hpp"
+#include "Ui/IAppUi.h"
 
 using namespace App;
 using namespace Camera;
@@ -18,6 +19,7 @@ Application::Application (const string& title, const IPathService* paths)
     , m_window (title)
     , m_renderer (m_window.native (), paths)
     , m_imgui (m_window.native (), m_renderer.native (), paths)
+    , m_ui {Ui::createAppUi ()}
 {
     ZoneScoped;
     init ();
@@ -66,7 +68,14 @@ ExitStatus Application::run ()
 
         if (!m_isMinimized)
         {
-            m_ui.update (m_model, &camTexture);
+            m_model.camera = Ui::ImageInfo {
+                .textureId = camTexture.getImguiTextureId (),
+                .width = camTexture.getWidth (),
+                .height = camTexture.getHeight (),
+                .isValid = camTexture.isValid ()
+            };
+
+            m_ui->update (m_model);
             m_renderer.update (m_model);
         }
         m_imgui.endFrame ();

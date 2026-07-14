@@ -1,0 +1,93 @@
+
+# 2026-07-10 10:18:13.863645
++n
+
+# 2026-07-10 10:22:08.796006
++/help
+
+# 2026-07-10 10:22:45.464777
++/models
+
+# 2026-07-10 10:22:59.513215
++/map
+
+# 2026-07-10 10:23:33.885478
++/ask Add comments to Log.hpp
+
+# 2026-07-10 10:25:10.983241
++/ask Can you use different syntax? like in ICamera.h ?
+
+# 2026-07-10 10:25:57.754550
++/ask I have expected /** */
+
+# 2026-07-10 10:28:19.093164
++/quit
+
+# 2026-07-10 10:30:58.391590
++/ask Can you create modul Ui ?
+
+# 2026-07-10 10:30:58.392590
++/ask Can you create modul Ui ?
+
+# 2026-07-10 10:37:31.284981
++/ask Can you add new Cmake module in src ?
+
+# 2026-07-10 10:37:31.295165
++/ask Can you add new Cmake module in src ?
+
+# 2026-07-10 10:43:14.872254
++/ask Add module Ui
+
+# 2026-07-10 10:43:14.872254
++/ask Add module Ui
+
+# 2026-07-10 10:46:21.637439
++/ask replace namespace App in Core module with core
+
+# 2026-07-10 10:46:21.637439
++/ask replace namespace App in Core module with core
+
+# 2026-07-10 10:48:48.723277
++/ask try to find bugs and problems
+
+# 2026-07-10 10:48:48.723277
++/ask try to find bugs and problems
+
+# 2026-07-10 10:56:54.917081
++/ask Check how to improve logs
+
+# 2026-07-10 10:56:54.917081
++/ask Check how to improve logs
+
+# 2026-07-10 12:11:32.193246
++/quit
+
+# 2026-07-10 12:12:46.061508
++Ask where is sdl initialized?
+
+# 2026-07-10 12:12:46.062544
++Ask where is sdl initialized?
+
+# 2026-07-10 12:14:47.640355
++every comment must start with big letter and and with dot.
+
+# 2026-07-10 12:14:47.640355
++every comment must start with big letter and and with dot.
+
+# 2026-07-10 12:23:20.786522
++/ask Test application is created in `core` module,  but it should be done in tests. change it
+
+# 2026-07-10 12:23:20.787522
++/ask Test application is created in `core` module,  but it should be done in tests. change it
+
+# 2026-07-10 12:35:32.945561
++/ask Which external modules are used in project?
+
+# 2026-07-10 12:36:16.414743
++ok, dalo by se ugradovad na sdl3 ?
+
+# 2026-07-10 12:37:05.411224
++a
+
+# 2026-07-10 12:43:18.464816
++/quit

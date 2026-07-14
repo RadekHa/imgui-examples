@@ -1,13 +1,14 @@
 #pragma once
-#include "AppUi.h"
-#include "DataModel.h"
 #include "EventBus.h"
-#include "ImGuiPass.h"
 #include "IPathService.h"
+#include "ImGuiPass.h"
 #include "SdlEventTranslator.h"
 #include "SdlRenderer.h"
 #include "SdlWindow.h"
+#include "Types/DataModel.h"
+#include "Ui/IAppUi.h"
 
+#include <memory>
 #include <string>
 
 namespace App
@@ -68,6 +69,6 @@ namespace App
         /** The SDL event translator for processing SDL events and translating them into application events. */
         SdlEventTranslator m_eventTranslator;
         /** The user interface for the application. */
-        Ui::AppUi m_ui;
+        std::unique_ptr<Ui::IAppUi> m_ui;
     };
 }

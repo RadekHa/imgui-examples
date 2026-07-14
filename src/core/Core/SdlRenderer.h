@@ -1,5 +1,5 @@
 #pragma once
-#include "DataModel.h"
+#include "Types/DataModel.h"
 #include "IPathService.h"
 #include "SdlWrapper.h"
 
