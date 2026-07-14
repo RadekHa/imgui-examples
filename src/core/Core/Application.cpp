@@ -68,14 +68,13 @@ ExitStatus Application::run ()
 
         if (!m_isMinimized)
         {
-            if (camTexture.isValid ())
-            {
-                m_model.camera = Ui::ImageInfo{ camTexture.getImguiTextureId (), camTexture.getWidth (), camTexture.getHeight (), true };
-            }
-            else
-            {
-                m_model.camera = Ui::ImageInfo{};
-            }
+            m_model.camera = Ui::ImageInfo {
+                .textureId = camTexture.getImguiTextureId (),
+                .width = camTexture.getWidth (),
+                .height = camTexture.getHeight (),
+                .isValid = camTexture.isValid ()
+            };
+
             m_ui->update (m_model);
             m_renderer.update (m_model);
         }

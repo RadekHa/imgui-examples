@@ -12,6 +12,6 @@ namespace Ui
         /** Height of the camera frame in pixels. */
         int height{};
         /** Flag indicating whether the camera frame data is valid. */
-        bool valid{};
+        bool isValid{};
     };
 }

@@ -2,11 +2,23 @@
 #include "StateStart.h"
 #include "Types/DataModel.h"
 
-#include "imgui.h"
+#include <imgui.h>
+
+#include <algorithm>
 
 using namespace App;
 using namespace Ui;
 
+///////////////////////////////////////////////////////////////////////////////
+// Factory function.
+
+IAppUi* Ui::createAppUi ()
+{
+    return new AppUi;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// AppUi
 
 AppUi::AppUi ()
     : m_state {new StateStart}
@@ -15,13 +27,6 @@ AppUi::AppUi ()
 
 AppUi::~AppUi () = default;
 
-namespace Ui
-{
-    IAppUi* createAppUi ()
-    {
-        return new AppUi;
-    }
-}
 
 void AppUi::update (App::DataModel& model)
 {
@@ -44,7 +49,7 @@ void AppUi::update (App::DataModel& model)
         ImGui::ShowDemoWindow (&model.showDemo);
     }
 
-    if (model.camera.valid)
+    if (model.camera.isValid && (model.camera.width != 0) && (model.camera.height != 0))
     {
         ImGui::Begin ("Camera");
 
