@@ -1,10 +1,10 @@
 #pragma once
-#include "EventBus.h"
-#include "IPathService.h"
-#include "ImGuiPass.h"
-#include "SdlEventTranslator.h"
-#include "SdlRenderer.h"
-#include "SdlWindow.h"
+#include "Events/Bus.h"
+#include "Sdl/ImGuiPass.h"
+#include "Sdl/IPathService.h"
+#include "Sdl/SdlEventTranslator.h"
+#include "Sdl/SdlRenderer.h"
+#include "Sdl/SdlWindow.h"
 #include "Types/DataModel.h"
 #include "Ui/IAppUi.h"
 

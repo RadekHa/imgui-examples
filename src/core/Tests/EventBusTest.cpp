@@ -1,4 +1,4 @@
-#include "Core/EventBus.h"
+#include "Events/Bus.h"
 
 #include <catch2/catch_test_macros.hpp>
 

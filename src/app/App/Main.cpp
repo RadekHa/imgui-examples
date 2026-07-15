@@ -1,7 +1,7 @@
 #define SDL_MAIN_HANDLED
 #include "Core/Application.hpp"
-#include "Core/IPathService.h"
-#include "Core/SdlContext.h"
+#include "Sdl/IPathService.h"
+#include "Sdl/SdlContext.h"
 #include "TraceLog/Log.hpp"
 #include "TraceLog/Tracy.hpp"
 
