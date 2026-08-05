@@ -66,7 +66,7 @@ SDL_Renderer* SdlRenderer::native () const
     return m_renderer.get ();
 }
 
-void SdlRenderer::update (DataModel& model)
+void SdlRenderer::update (DataModel& /*model*/)
 {
     if (m_background)
     {
