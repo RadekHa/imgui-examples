@@ -1,6 +1,6 @@
 #pragma once
-#include "BusImpl.h"
-#include "Events.h"
+#include "Events/BusImpl.h"
+#include "Events/Events.h"
 
 #include <variant>
 

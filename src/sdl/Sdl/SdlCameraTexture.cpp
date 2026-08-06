@@ -68,6 +68,9 @@ bool SdlCameraTexture::isValid () const
 
 void SdlCameraTexture::recreate (int width, int height)
 {
+    m_width = 0;
+    m_height = 0;
+
     m_texture = SdlTexturePtr{SDL_CreateTexture (
                                   m_renderer,
                                   SDL_PIXELFORMAT_RGB24,

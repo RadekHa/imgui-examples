@@ -1,5 +1,5 @@
 #pragma once
-#include "SdlWrapper.h"
+#include "Sdl/SdlWrapper.h"
 
 #include <string>
 #include <vector>
@@ -32,9 +32,9 @@ namespace App
 
         /** Returns the native SDL window pointer. */
         SDL_Window* native () const;
-        /* Polls and returns a vector of SDL events. */
+        /** Polls and returns a vector of SDL events. */
         void pollEvents (std::vector<SDL_Event>& events) const;
-        /* Resizes the window based on the provided scale factor. */
+        /** Resizes the window based on the provided scale factor. */
         void resize (float scale);
     private:
         /** The native SDL window pointer wrapped in a smart pointer for automatic resource management. */

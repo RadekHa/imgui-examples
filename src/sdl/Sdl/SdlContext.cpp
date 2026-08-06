@@ -1,4 +1,4 @@
-#include "SDLContext.h"
+#include "SdlContext.h"
 
 #include <SDL2/SDL.h>
 

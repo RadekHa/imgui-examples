@@ -2,7 +2,7 @@
 
 namespace App
 {
-    /* Class responsible for managing the SDL context. */
+    /** Class responsible for managing the SDL context. */
     struct SdlContext
     {
         /** Initializes the SDL. */
