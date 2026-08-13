@@ -51,10 +51,11 @@ Each module is its own CMake target under `src/<module>/` with a `<Module>/CMake
 
 | Module | Target | Notes |
 | --- | --- | --- |
-| `app` | executable `App` | `src/app/App/Main.cpp`. Links `Core`, `Tracy::TracyClient`. Pulls in `app.rc` / `.manifest` / `.desktop.in` / `Info.plist` from `src/app/Manifests/` and the icon/font assets via `src/app/cmake/AppAssets.cmake`. |
-| `core` | static `Core` | The SDL/ImGui glue. Window, renderer, event translator, ImGui pass, DPI handler, camera texture, `Application` class. Depends on `Ui`, `Types`, `TraceLog`, `Image`, `SDL2::SDL2`, `imgui`, `Settings`, `Camera`. |
+| `app` | executable `App` | `src/app/App/Main.cpp`. Links `Core`. Pulls in `app.rc` / `.manifest` / `.desktop.in` / `Info.plist` from `src/app/Manifests/` and the icon/font assets via `src/app/cmake/AppAssets.cmake`. |
+| `core` | static `Core` | The `Application` class. Depends on `Ui`, `Types`, `Sdl`, `Camera`, `TraceLog`, `Events`. |
+| `sdl` | static `Sdl` | SDL/ImGui glue. Window, renderer, event translator, ImGui pass, DPI handler, camera texture. Depends on `SDL2::SDL2`, `Events`, `Types`, `TraceLog`, `Image`, `Camera`, `imgui`, `Settings`. |
 | `ui` | static `Ui` | ImGui state machine. `IAppUi` (factory `createAppUi`) → `AppUi`; `IUiState` → `StateStart`/`StateLogin`/`StateNull`. Depends on `Types`, `imgui`, `TraceLog`. |
-| `events` | INTERFACE `Events` | Header-only. CMakeLists lists `Events/Bus.h`, `Events/BusImpl.h`, `Events/Events.h`, but only `Bus.h`/`BusImpl.h` exist on disk — `Events.h` still needs to be created. |
+| `events` | INTERFACE `Events` | Header-only. Event bus implementation and event type definitions (`Events/Bus.h`, `Events/BusImpl.h`, `Events/Events.h`). Defines `EventBus` and events: `EventQuit`, `EventClose`, `EventMinimized`, `EventShown`, `EventRestored`, `EventDisplayChanged`. |
 | `types` | INTERFACE `Types` | Header-only. `DataModel.h`, `ImageInfo.h`. |
 | `image` | static `Image` | Image loading via stb_image. Depends on `TraceLog`, `stb::image`. |
 | `camera` | static `Camera` | OpenCV-backed camera capture (`ICamera`, factory `createCamera(0)`). Depends on `TraceLog`, `opencv::{core,videoio,imgproc}`. |
@@ -62,7 +63,7 @@ Each module is its own CMake target under `src/<module>/` with a `<Module>/CMake
 | `traceLog` | static `TraceLog` | `spdlog` wrapper + `Tracy.hpp` (`ZoneScoped` macros used across the app). Depends on `Tracy::TracyClient`, `spdlog`. |
 | `tests` | OBJECT `TestRunner` | Shared Catch2 test objects. |
 
-The dependency order at the top of `src/CMakeLists.txt` is: `traceLog` → `types` → `ui` → `app` → `core` → `camera` → `image` → `settings` → `tests`. New modules need to be added here.
+The dependency order at the top of `src/CMakeLists.txt` is: `events` → `traceLog` → `types` → `ui` → `sdl` → `settings` → `image` → `camera` → `core` → `app` → `tests`. New modules need to be added here.
 
 ## Runtime architecture
 
@@ -76,9 +77,7 @@ The dependency order at the top of `src/CMakeLists.txt` is: `traceLog` → `type
 4. Ends ImGui + renderer frame.
 5. `m_bus.dispatch()` — all queued events fire.
 
-The event bus (`App::EventBusImpl<Events>`) is a queue-based variant dispatcher. Subscribers register lambdas or member functions and get back an RAII `Subscription` that auto-unsubscribes on destruction. `EventBus::Subscription` is move-only. `EventBus` is defined in `Core/EventBus.h`; the event types live in `Core/AppEvents.h` (`EventQuit`, `EventClose`, `EventMinimized`, `EventShown`, `EventRestored`, `EventDisplayChanged`). `Core` re-exports the bus under `App::`; the new `Events` module is intended to lift the bus out of `Core`.
-
-A separate `Events` module is being introduced (see recent `Events.h` deletion in `git log` for `src/events/`); until it is wired in, treat `Core/EventBus.h` and `Core/AppEvents.h` as the canonical event definitions.
+The event bus (`App::EventBusImpl<Events>`) is a queue-based variant dispatcher. Subscribers register lambdas or member functions and get back an RAII `Subscription` that auto-unsubscribes on destruction. `EventBus::Subscription` is move-only. `EventBus` is defined in `Events/Bus.h`; the event types live in `Events/Events.h` (`EventQuit`, `EventClose`, `EventMinimized`, `EventShown`, `EventRestored`, `EventDisplayChanged`). The `Events` module provides the bus implementation; `Events/Bus.h` re-exports the bus under the `App::` namespace.
 
 `DataModel` (in `Types/DataModel.h`) is the per-frame state object shared between `Core` and `Ui`. New fields that the UI needs to read go there.
 
