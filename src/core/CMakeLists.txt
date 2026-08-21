@@ -3,33 +3,17 @@ set(NAME "Core")
 include(${PROJECT_SOURCE_DIR}/cmake/StaticAnalyzers.cmake)
 
 add_library(${NAME} STATIC
-  "Core/AppEvents.h"
   "Core/Application.cpp"
   "Core/Application.hpp"
-  "Core/DpiHandler.cpp"
-  "Core/DpiHandler.h"
-  "Core/EventBus.h"
-  "Core/EventBusImpl.h"
-  "Core/ImGuiPass.cpp"
-  "Core/SdlContext.cpp"
-  "Core/SdlContext.h"
-  "Core/SdlEventTranslator.cpp"
-  "Core/SdlPathService.cpp"
-  "Core/SdlRenderer.cpp"
-  "Core/SdlWindow.cpp"
-  "Core/SdlUtils.h"
-  "Core/SdlUtils.cpp"
-  "Core/SdlCameraTexture.h"
-  "Core/SdlCameraTexture.cpp"
 )
 
 target_include_directories(${NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(${NAME} PRIVATE cxx_std_20)
 
 target_link_libraries(${NAME}
-  PUBLIC Ui Types
+  PUBLIC  Ui Types Sdl Camera TraceLog Events
   PRIVATE project_warnings
-  PUBLIC TraceLog Image SDL2::SDL2 imgui Settings Camera)
+)
 
 
 add_subdirectory(Tests)

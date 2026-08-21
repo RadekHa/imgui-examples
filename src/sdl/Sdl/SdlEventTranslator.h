@@ -1,5 +1,5 @@
 #pragma once
-#include "EventBus.h"
+#include "Events/Bus.h"
 
 #include <vector>
 
