@@ -1,7 +1,7 @@
 # Test cases
 set(NAME "CoreTest")
 
-add_executable(${NAME})
+add_library(${NAME} OBJECT)
 
 target_sources(${NAME}
 PUBLIC
@@ -11,9 +11,4 @@ PUBLIC
 
 target_compile_features(${NAME} PRIVATE cxx_std_20)
 
-target_link_libraries(${NAME} PRIVATE $<TARGET_OBJECTS:TestRunner> Catch2::Catch2WithMain Core)
-
-list(APPEND CMAKE_MODULE_PATH ${FETCHCONTENT_BASE_DIR}/catch2-src/extras)
-include(Catch)
-
-catch_discover_tests(${NAME})
+target_link_libraries(${NAME} PRIVATE Catch2::Catch2 Core)
