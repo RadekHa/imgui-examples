@@ -1,5 +1,6 @@
-#include "StateStart.h"
 #include "StateLogin.h"
+#include "StateStart.h"
+#include "TraceLog/Tracy.hpp"
 #include "Types/DataModel.h"
 
 #include "imgui.h"
@@ -9,6 +10,7 @@ using namespace Ui;
 
 IUiState* StateStart::update (App::DataModel& /*model*/)
 {
+    ZoneScoped;
     IUiState* state = nullptr;
 
     ImVec2 center = ImGui::GetMainViewport ()->GetCenter ();
