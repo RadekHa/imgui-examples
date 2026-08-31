@@ -9,7 +9,14 @@ PRIVATE
 
 target_compile_features(${NAME} PRIVATE cxx_std_20)
 
-target_link_libraries(${NAME} PRIVATE $<TARGET_OBJECTS:CoreTest> Catch2::Catch2WithMain)
+target_link_libraries(${NAME}
+   PRIVATE
+   $<TARGET_OBJECTS:CoreTest>
+   $<TARGET_OBJECTS:EventsTest>
+   $<TARGET_OBJECTS:ImageTest>
+   Image
+   Catch2::Catch2WithMain
+)
 
 list(APPEND CMAKE_MODULE_PATH ${FETCHCONTENT_BASE_DIR}/catch2-src/extras)
 include(Catch)
