@@ -1,13 +1,13 @@
 # Test cases
-set(NAME "CoreTest")
+set(NAME "ImageTest")
 
 add_library(${NAME} OBJECT)
 
 target_sources(${NAME}
 PUBLIC
-   Resources.spec.cpp
+   ImageTest.cpp
 )
 
 target_compile_features(${NAME} PRIVATE cxx_std_20)
 
-target_link_libraries(${NAME} PRIVATE Catch2::Catch2 Core)
+target_link_libraries(${NAME} PRIVATE Catch2::Catch2 Image)

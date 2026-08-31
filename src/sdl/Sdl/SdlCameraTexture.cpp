@@ -1,6 +1,5 @@
-#include "SdlCameraTexture.h"
-
 #include "Camera/ICamera.h"
+#include "SdlCameraTexture.h"
 #include "TraceLog/Log.hpp"
 
 #include <SDL.h>

@@ -6,31 +6,36 @@ FetchContent_Declare(
   Catch2
   GIT_REPOSITORY "https://github.com/catchorg/Catch2.git"
   GIT_TAG "v3.11.0"
+  EXCLUDE_FROM_ALL
 )
 
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY "https://github.com/ocornut/imgui.git"
   GIT_TAG docking
+  EXCLUDE_FROM_ALL
 )
 
 FetchContent_Declare(
   SDL2
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
   GIT_TAG release-2.30.9
+  EXCLUDE_FROM_ALL
 )
 
 FetchContent_Declare(
   spdlog
   GIT_REPOSITORY "https://github.com/gabime/spdlog.git"
   GIT_TAG v1.15.0
+  EXCLUDE_FROM_ALL
 )
 
 FetchContent_Declare(
   tracy
   GIT_REPOSITORY "https://github.com/wolfpld/tracy.git"
-  GIT_TAG master
-#  GIT_TAG v0.13.2
+#  GIT_TAG master
+  GIT_TAG v0.14.0
+  EXCLUDE_FROM_ALL
 )
 
 FetchContent_Declare(
@@ -45,6 +50,7 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/opencv/opencv.git
     GIT_TAG        5.0.0
     GIT_SHALLOW    TRUE
+    EXCLUDE_FROM_ALL
 )
 
 # Settings
@@ -57,6 +63,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(FMT_INSTALL OFF)
 set(SDL2_DISABLE_SDL2MAIN ON)
+set(SDL_SHARED ON)
 set(SPDLOG_FMT_EXTERNAL OFF)
 set(SPDLOG_USE_STD_FORMAT ON)
 
