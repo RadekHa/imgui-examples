@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 namespace Sdl
 {
@@ -29,7 +29,7 @@ namespace Sdl
     {
         void operator() (SDL_Surface* s) const noexcept
         {
-            SDL_FreeSurface (s);
+            SDL_DestroySurface (s);
         }
     };
 
@@ -63,14 +63,14 @@ namespace Sdl
         }
     };
 
-    /** Smart pointer type for SDL2 text. */
+    /** Smart pointer type for SDL3 text. */
     using SdlTextPtr = SdlResource<char>;
-    /** Smart pointer type for SDL2 surface. */
+    /** Smart pointer type for SDL3 surface. */
     using SdlSurfacePtr = SdlResource<SDL_Surface>;
-    /** Smart pointer type for SDL2 texture. */
+    /** Smart pointer type for SDL3 texture. */
     using SdlTexturePtr = SdlResource<SDL_Texture>;
-    /** Smart pointer type for SDL2 window. */
+    /** Smart pointer type for SDL3 window. */
     using SdlWindowPtr = SdlResource<SDL_Window>;
-    /** Smart pointer type for SDL2 renderer. */
+    /** Smart pointer type for SDL3 renderer. */
     using SdlRendererPtr = SdlResource<SDL_Renderer>;
 }

@@ -17,11 +17,13 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
-  SDL2
+  SDL3
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
-  GIT_TAG release-2.30.9
-  EXCLUDE_FROM_ALL
+  GIT_TAG release-3.4.14
 )
+
+set(SDL_SHARED ON CACHE BOOL "" FORCE)
+set(SDL_STATIC OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
   spdlog
@@ -73,4 +75,4 @@ add_subdirectory(opencv-setup)
 
 # Populate
 
-FetchContent_MakeAvailable(Catch2 SDL2 spdlog tracy)
+FetchContent_MakeAvailable(Catch2 SDL3 spdlog tracy)

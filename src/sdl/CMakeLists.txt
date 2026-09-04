@@ -21,6 +21,6 @@ target_include_directories(${NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(${NAME} PRIVATE cxx_std_20)
 
 target_link_libraries(${NAME}
-  PUBLIC  SDL2::SDL2 Events Types
+  PUBLIC  SDL3::SDL3-shared Events Types
   PRIVATE project_warnings TraceLog Image Camera imgui Settings
 )

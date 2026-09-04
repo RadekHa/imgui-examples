@@ -10,7 +10,7 @@ using namespace std;
 SdlWindow::SdlWindow (const string& title)
     : m_scale {1.0}
 {
-    const auto flags = static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    const auto flags = static_cast<SDL_WindowFlags> (SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
 
     constexpr int width{1280};
     constexpr int height{720};
@@ -18,8 +18,6 @@ SdlWindow::SdlWindow (const string& title)
     m_window = SdlWindowPtr{
         SDL_CreateWindow (
             title.c_str (),
-            SDL_WINDOWPOS_CENTERED,
-            SDL_WINDOWPOS_CENTERED,
             width,
             height,
             flags)
@@ -40,7 +38,7 @@ SdlWindow::~SdlWindow () = default;
 
 int SdlWindow::getWindowDisplayIndex () const
 {
-    return SDL_GetWindowDisplayIndex (m_window.get ());
+    return SDL_GetDisplayForWindow (m_window.get ());
 }
 
 SDL_Window* SdlWindow::native () const

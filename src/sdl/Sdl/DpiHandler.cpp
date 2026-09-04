@@ -1,34 +1,27 @@
 #include "DpiHandler.h"
 #include "TraceLog/Log.hpp"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 float App::dpi::getScale (int32_t displayIndex)
 {
-    constexpr float default_dpi{96.0f};
-    float dpi{default_dpi};
+    float scale = SDL_GetDisplayContentScale (static_cast<SDL_DisplayID>(displayIndex));
 
-    if (SDL_GetDisplayDPI (displayIndex, nullptr, &dpi, nullptr) != 0)
-    {
-        APP_WARN ("SDL_GetDisplayDPI failed: {}", SDL_GetError ());
-        return 1.0f;
-    }
-
-    if (dpi <= 0.0f)
+    if (scale <= 0.0f)
     {
         return 1.0f;
     }
-    return dpi / default_dpi;
+    return scale;
 }
 
 float App::dpi::getScale (SDL_Window* window)
 {
-    int displayIndex = SDL_GetWindowDisplayIndex (window);
+    SDL_DisplayID displayID = SDL_GetDisplayForWindow (window);
 
-    if (displayIndex < 0)
+    if (displayID == 0)
     {
-        APP_WARN ("SDL_GetWindowDisplayIndex failed: {}", SDL_GetError ());
+        APP_WARN ("SDL_GetDisplayForWindow failed: {}", SDL_GetError ());
         return 1.0f;
     }
-    return getScale (displayIndex);
+    return SDL_GetDisplayContentScale (displayID);
 }
