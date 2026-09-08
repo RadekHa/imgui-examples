@@ -1,6 +1,6 @@
 FetchContent_MakeAvailable(imgui)
 
-add_library(imgui
+add_library(imgui STATIC
   ${imgui_SOURCE_DIR}/imgui.cpp ${imgui_SOURCE_DIR}/imgui.h
   ${imgui_SOURCE_DIR}/imconfig.h ${imgui_SOURCE_DIR}/imgui_demo.cpp
   ${imgui_SOURCE_DIR}/imgui_draw.cpp ${imgui_SOURCE_DIR}/imgui_internal.h
@@ -12,4 +12,4 @@ add_library(imgui
 
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 target_compile_features(imgui PRIVATE cxx_std_20)
-target_link_libraries(imgui PUBLIC SDL3::SDL3-shared)
+target_link_libraries(imgui PUBLIC SDL3::SDL3)
