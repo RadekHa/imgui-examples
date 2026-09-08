@@ -5,7 +5,7 @@
 
 float App::dpi::getScale (int32_t displayIndex)
 {
-    float scale = SDL_GetDisplayContentScale (static_cast<SDL_DisplayID>(displayIndex));
+    float scale = SDL_GetDisplayContentScale (static_cast<SDL_DisplayID> (displayIndex));
 
     if (scale <= 0.0f)
     {
@@ -16,12 +16,11 @@ float App::dpi::getScale (int32_t displayIndex)
 
 float App::dpi::getScale (SDL_Window* window)
 {
-    SDL_DisplayID displayID = SDL_GetDisplayForWindow (window);
+    float scale = SDL_GetWindowDisplayScale (window);
 
-    if (displayID == 0)
+    if (scale <= 0.0f)
     {
-        APP_WARN ("SDL_GetDisplayForWindow failed: {}", SDL_GetError ());
         return 1.0f;
     }
-    return SDL_GetDisplayContentScale (displayID);
+    return scale;
 }

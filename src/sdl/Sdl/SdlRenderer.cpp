@@ -66,7 +66,6 @@ void SdlRenderer::update (DataModel& /*model*/)
 
         SDL_FRect destinationRect{.x = 50.0f, .y = 50.0f, .w = (float) textureWidth, .h = (float) textureHeight};
 
-        SDL_RenderTexture (m_renderer.get (), m_background.get (), nullptr, nullptr);
         SDL_RenderTexture (m_renderer.get (), m_background.get (), nullptr, &destinationRect);
     }
 }
