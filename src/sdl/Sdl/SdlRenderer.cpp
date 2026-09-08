@@ -16,31 +16,20 @@ SdlRenderer::SdlRenderer (SDL_Window* window, const IPathService* paths)
     {
         throw runtime_error ("Window parameter cannot be null");
     }
-    // Define a structured pair for configuration: [renderer flags, description for logging]
-    const pair<Uint32, string_view> rendererConfigs [] = {
-        {SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC, "Hardware Accelerated + VSync"},
-        {SDL_RENDERER_ACCELERATED, "Hardware Accelerated (No VSync)"},
-        {SDL_RENDERER_SOFTWARE, "Software Renderer (CPU Fallback)"}
-    };
+    m_renderer = SdlRendererPtr{SDL_CreateRenderer (window, nullptr)};
 
-    // Iterate through configurations and attempt to create the renderer
-    for (const auto& [flags, description] : rendererConfigs)
+    if (m_renderer)
     {
-        m_renderer = SdlRendererPtr{SDL_CreateRenderer (window, -1, flags)};
-
-        if (m_renderer)
-        {
-            APP_INFO ("Renderer successfully created using mode: {}", description);
-            break; // Found a working renderer, exit the loop
-        }
-        // Log a warning if the current mode failed, but only if we are not at the end of the chain
-        APP_WARN ("Renderer mode '{}' failed ({}).", description, SDL_GetError ());
+        const char* name = SDL_GetRendererName (m_renderer.get ());
+        // Enable VSync
+        SDL_SetRenderVSync (m_renderer.get (), 1);
+        APP_INFO ("Renderer successfully created using backend: {}", name);
     }
 
-    // Final safety check to ensure at least the software renderer was initialized
+    // Final safety check
     if (!m_renderer)
     {
-        APP_FATAL ("Fatal error: All available renderer modes failed to initialize: {}", SDL_GetError ());
+        APP_FATAL ("Fatal error: All available renderer backends failed to initialize: {}", SDL_GetError ());
         throw runtime_error (SDL_GetError ());
     }
     // Load texture.
@@ -51,7 +40,7 @@ SdlRenderer::~SdlRenderer () = default;
 
 void SdlRenderer::beginFrame (const FrameContext& ctx)
 {
-    SDL_RenderSetScale (m_renderer.get (), ctx.scaleX, ctx.scaleY);
+    SDL_SetRenderScale (m_renderer.get (), ctx.scaleX, ctx.scaleY);
     SDL_SetRenderDrawColor (m_renderer.get (), 100, 100, 100, 255);
     SDL_RenderClear (m_renderer.get ());
 }
@@ -70,14 +59,13 @@ void SdlRenderer::update (DataModel& /*model*/)
 {
     if (m_background)
     {
-        int textureWidth = 0;
-        int textureHeight = 0;
+        float textureWidth = 0;
+        float textureHeight = 0;
 
-        SDL_QueryTexture (m_background.get (), nullptr, nullptr, &textureWidth, &textureHeight);
+        SDL_GetTextureSize (m_background.get (), &textureWidth, &textureHeight);
 
-        SDL_Rect destinationRect{.x = 50, .y = 50, .w = textureWidth, .h = textureHeight};
+        SDL_FRect destinationRect{.x = 50.0f, .y = 50.0f, .w = (float) textureWidth, .h = (float) textureHeight};
 
-        SDL_RenderCopy (m_renderer.get (), m_background.get (), nullptr, nullptr);
-        SDL_RenderCopy (m_renderer.get (), m_background.get (), nullptr, &destinationRect);
+        SDL_RenderTexture (m_renderer.get (), m_background.get (), nullptr, &destinationRect);
     }
 }

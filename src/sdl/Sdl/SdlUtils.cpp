@@ -2,6 +2,8 @@
 #include "SdlUtils.h"
 #include "TraceLog/Log.hpp"
 
+#include <SDL3/SDL.h>
+
 using namespace std;
 using namespace Sdl;
 
@@ -55,13 +57,13 @@ SdlTexturePtr App::LoadTexture (SDL_Renderer* renderer, string_view filePath)
     }
     int pitch = img->getWidth () * desiredChannels;
 
-    if (SDL_UpdateTexture (texture.get (), nullptr, img->getPixels (), pitch) < 0)
+    if (!SDL_UpdateTexture (texture.get (), nullptr, img->getPixels (), pitch))
     {
         APP_ERROR ("Failed to update texture from '{}': {}", filePath, SDL_GetError ());
         return nullptr;
     }
 
-    if (SDL_SetTextureBlendMode (texture.get (), SDL_BLENDMODE_BLEND) < 0)
+    if (!SDL_SetTextureBlendMode (texture.get (), SDL_BLENDMODE_BLEND))
     {
         APP_WARN ("Failed to set blend mode for '{}': {}", filePath, SDL_GetError ());
     }

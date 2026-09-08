@@ -2,7 +2,7 @@
 #include "SdlCameraTexture.h"
 #include "TraceLog/Log.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <stdexcept>
 
 using namespace Camera;
@@ -39,7 +39,7 @@ void SdlCameraTexture::update (const CameraFrame& frame)
     }
     const int pitch = frame.width * frame.channels;
 
-    if (SDL_UpdateTexture (m_texture.get (), nullptr, frame.data, pitch) != 0)
+    if (!SDL_UpdateTexture (m_texture.get (), nullptr, frame.data, pitch))
     {
         APP_WARN ("SDL_UpdateTexture failed: {}", SDL_GetError ());
     }

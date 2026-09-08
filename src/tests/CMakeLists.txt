@@ -13,6 +13,7 @@ target_link_libraries(${NAME}
     $<TARGET_OBJECTS:ImageTest>
     Image
     Catch2::Catch2WithMain
+    TraceLog
 )
 
 list(APPEND CMAKE_MODULE_PATH ${FETCHCONTENT_BASE_DIR}/catch2-src/extras)

@@ -2,7 +2,7 @@ set(NAME "Ui")
 
 include(${PROJECT_SOURCE_DIR}/cmake/StaticAnalyzers.cmake)
 
-add_library(${NAME} STATIC
+add_library(${NAME}
   "Ui/IAppUi.h"
   "Ui/src/IUiState.h"
   "Ui/src/AppUi.h"
