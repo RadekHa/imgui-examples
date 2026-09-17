@@ -3,9 +3,9 @@
 #include "ImGuiPass.h"
 #include "TraceLog/Log.hpp"
 
-#include <SDL_events.h>
-#include <backends/imgui_impl_sdl2.h>
-#include <backends/imgui_impl_sdlrenderer2.h>
+#include <SDL3/SDL_events.h>
+#include <backends/imgui_impl_sdl3.h>
+#include <backends/imgui_impl_sdlrenderer3.h>
 
 #include <stdexcept>
 
@@ -35,21 +35,21 @@ ImGuiPass::ImGuiPass (SDL_Window* window, SDL_Renderer* renderer, const IPathSer
     float scale = dpi::getScale (window);
     applyPaths (scale);
 
-    if (!ImGui_ImplSDL2_InitForSDLRenderer (window, renderer))
+    if (!ImGui_ImplSDL3_InitForSDLRenderer (window, renderer))
     {
-        throw runtime_error ("ImGui_ImplSDL2_InitForSDLRenderer failed");
+        throw runtime_error ("ImGui_ImplSDL3_InitForSDLRenderer failed");
     }
 
-    if (!ImGui_ImplSDLRenderer2_Init (renderer))
+    if (!ImGui_ImplSDLRenderer3_Init (renderer))
     {
-        throw runtime_error ("ImGui_ImplSDLRenderer2_Init failed");
+        throw runtime_error ("ImGui_ImplSDLRenderer3_Init failed");
     }
 }
 
 ImGuiPass::~ImGuiPass ()
 {
-    ImGui_ImplSDLRenderer2_Shutdown ();
-    ImGui_ImplSDL2_Shutdown ();
+    ImGui_ImplSDLRenderer3_Shutdown ();
+    ImGui_ImplSDL3_Shutdown ();
     ImGui::DestroyContext ();
 }
 
@@ -57,10 +57,10 @@ void ImGuiPass::beginFrame (const vector<SDL_Event>& events)
 {
     for (const auto& e : events)
     {
-        ImGui_ImplSDL2_ProcessEvent (&e);
+        ImGui_ImplSDL3_ProcessEvent (&e);
     }
-    ImGui_ImplSDLRenderer2_NewFrame ();
-    ImGui_ImplSDL2_NewFrame ();
+    ImGui_ImplSDLRenderer3_NewFrame ();
+    ImGui_ImplSDL3_NewFrame ();
     ImGui::NewFrame ();
 }
 
@@ -68,7 +68,7 @@ void ImGuiPass::endFrame ()
 {
     ImGui::Render ();
 
-    ImGui_ImplSDLRenderer2_RenderDrawData (ImGui::GetDrawData (), m_renderer);
+    ImGui_ImplSDLRenderer3_RenderDrawData (ImGui::GetDrawData (), m_renderer);
 
     ImGuiIO& io = ImGui::GetIO ();
 
@@ -92,14 +92,14 @@ void ImGuiPass::rebuildFonts (float scale)
     {
         ImGuiIO& io = ImGui::GetIO ();
 
-        ImGui_ImplSDLRenderer2_DestroyDeviceObjects ();
+        ImGui_ImplSDLRenderer3_DestroyDeviceObjects ();
 
         io.Fonts->Clear ();
         io.FontDefault = nullptr;
         applyPaths (scale);
         io.Fonts->Build ();
 
-        ImGui_ImplSDLRenderer2_CreateDeviceObjects ();
+        ImGui_ImplSDLRenderer3_CreateDeviceObjects ();
     }
 }
 

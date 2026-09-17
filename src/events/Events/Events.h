@@ -19,4 +19,10 @@ namespace App
         /** The index of the new display. */
         int32_t displayIndex;
     };
+    /** Event representing a scale change request. */
+    struct EventScaleChanged
+    {
+        /** The new scale factor. */
+        float scale;
+    };
 }

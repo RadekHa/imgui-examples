@@ -103,11 +103,9 @@ void Application::init ()
         m_isMinimized = false;
     }));
 
-    m_subscriptions.emplace_back (m_bus.subscribe<EventDisplayChanged> ( [this] (const auto& e) {
-        APP_INFO ("Display changed: {}", e.displayIndex);
-
-        float scale = dpi::getScale (e.displayIndex);
-        m_window.resize (scale);
-        m_imgui.rebuildFonts (scale);
+    m_subscriptions.emplace_back (m_bus.subscribe<EventScaleChanged> ( [this] (const auto& e) {
+        APP_INFO ("Scale changed: {}", e.scale);
+        m_window.resize (e.scale);
+        m_imgui.rebuildFonts (e.scale);
     }));
 }

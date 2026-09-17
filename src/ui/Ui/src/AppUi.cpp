@@ -1,11 +1,11 @@
 #include "AppUi.h"
 #include "StateStart.h"
+#include "TraceLog/Tracy.hpp"
 #include "Types/DataModel.h"
 
 #include <imgui.h>
 
 #include <algorithm>
-
 using namespace App;
 using namespace Ui;
 
@@ -30,6 +30,8 @@ AppUi::~AppUi () = default;
 
 void AppUi::update (App::DataModel& model)
 {
+    ZoneScoped;
+
     ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
 
     ImGui::DockSpaceOverViewport (0, ImGui::GetMainViewport (), dockspaceFlags);

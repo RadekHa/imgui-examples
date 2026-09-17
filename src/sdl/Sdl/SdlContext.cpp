@@ -1,6 +1,6 @@
 #include "SdlContext.h"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include <stdexcept>
 
@@ -9,9 +9,9 @@ using namespace std;
 
 SdlContext::SdlContext ()
 {
-    SDL_SetHint (SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
+    // SDL3 handles DPI automatically, no hint needed
 
-    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
+    if (!SDL_Init (SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
     {
         throw runtime_error (SDL_GetError ());
     }

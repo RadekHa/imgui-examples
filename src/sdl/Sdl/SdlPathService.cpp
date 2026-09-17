@@ -1,7 +1,7 @@
 #include "SdlPathService.h"
 #include "Settings/Project.hpp"
 
-#include <SDL_filesystem.h>
+#include <SDL3/SDL_filesystem.h>
 
 namespace fs = std::filesystem;
 using namespace App;
@@ -48,7 +48,7 @@ string SDLPathService::getResourcePath (string_view filePath) const
 
 fs::path SDLPathService::getBaseResourcePath () const
 {
-    fs::path resourcePath = fs::path (m_basePath.get ()) / ".." / "share";
+    fs::path resourcePath = fs::path (m_basePath) / ".." / "share";
     return resourcePath.lexically_normal ();
 }
 
