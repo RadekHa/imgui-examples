@@ -27,10 +27,6 @@ SdlWindow::SdlWindow (const string& title)
     {
         throw runtime_error (SDL_GetError ());
     }
-    // Set the initial window size based on the DPI scale factor of the display.
-    const float scale = dpi::getScale (m_window.get ());
-    resize (scale);
-
     SDL_SetWindowPosition (m_window.get (), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
