@@ -1,23 +1,29 @@
 #pragma once
 #include "Camera/ICamera.h"
 
-#include <opencv2/core.hpp>
-#include <opencv2/videoio.hpp>
+#include <SDL3/SDL.h>
 
+#include <memory>
 #include <mutex>
-#include <thread>
 
 namespace Camera
 {
-    class OpenCVCamera : public ICamera
+    /**
+      * SDL3-based camera implementation using the native SDL_Camera API.
+      */
+    class SDLCamera : public ICamera
     {
     public:
-        /** Initialize attributes of the class. */
-        OpenCVCamera ();
-        /** Stop the thread and delete class resources. */
-        ~OpenCVCamera ();
+        /** Default constructor. */
+        SDLCamera ();
+        /** Destructor - closes the camera if open. */
+        ~SDLCamera () override;
 
-        /** Open camera with selected index. */
+        /**
+          * Open a camera device by index.
+          * @param cameraIndex Index of the camera device to open (0 = first device).
+          * @return true if camera was successfully opened, false otherwise.
+          */
         bool open (int cameraIndex);
 
         /** {@inheritDoc} */
@@ -28,21 +34,14 @@ namespace Camera
         bool isOpen () const override;
 
     private:
-        /** A thread procedure for asynchronous frame reading. */
-        void captureLoop (std::stop_token stopToken);
-        /** Class for video capturing from cameras */
-        cv::VideoCapture m_capture;
-        /** Mutex for protecting asynchronously updated members. */
+        using SDLCameraPtr = std::unique_ptr<SDL_Camera, void (*)(SDL_Camera*)>;
+        /** Opaque SDL camera handle managed via RAII. */
+        SDLCameraPtr m_camera{nullptr, SDL_CloseCamera};
+        /** True when user has granted camera permission. */
+        bool m_permissionGranted = false;
+        /** RGB24 converted surface for frame data. */
+        std::unique_ptr<SDL_Surface, void (*)(SDL_Surface*)> m_rgbSurface;
+        /** Mutex protecting frame access. */
         std::mutex m_mutex;
-        /** Buffer for reading from camera. */
-        cv::Mat m_backBuffer;
-        /** Buffer for processing. */
-        cv::Mat m_frontBuffer;
-        /** Buffer used to switch from BRG to TGB.*/
-        cv::Mat m_rgb;
-        /** Flag, that the new frame is ready. */
-        bool m_isNewFrame;
-        /** Thread for asynchronous reading. */
-        std::jthread m_thread;
     };
 }

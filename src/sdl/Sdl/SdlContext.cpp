@@ -11,7 +11,7 @@ SdlContext::SdlContext ()
 {
     // SDL3 handles DPI automatically, no hint needed
 
-    if (!SDL_Init (SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
+    if (!SDL_Init (SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_CAMERA))
     {
         throw runtime_error (SDL_GetError ());
     }

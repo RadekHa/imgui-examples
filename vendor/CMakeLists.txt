@@ -46,14 +46,6 @@ FetchContent_Declare(
     DOWNLOAD_NO_EXTRACT TRUE
 )
 
-FetchContent_Declare(
-    opencv
-    GIT_REPOSITORY https://github.com/opencv/opencv.git
-    GIT_TAG        5.0.0
-    GIT_SHALLOW    TRUE
-    EXCLUDE_FROM_ALL
-)
-
 # Settings
 
 # For SDL to be able to override options
@@ -73,7 +65,6 @@ set(CATCH2_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(imgui-setup)
 add_subdirectory(stb-setup)
-add_subdirectory(opencv-setup)
 
 # Populate
 
