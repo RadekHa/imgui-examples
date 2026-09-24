@@ -125,6 +125,7 @@ bool SDLCamera::read (CameraFrame& frame)
                         frame.width = m_rgbSurface->w;
                         frame.height = m_rgbSurface->h;
                         frame.channels = 3;
+                        frame.pitch = m_rgbSurface->pitch;
                         result = true;
                     }
                     else

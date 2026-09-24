@@ -11,6 +11,8 @@ namespace Camera
         int width{};
         int height{};
         int channels{};
+        /** Byte stride (may be > width * channels due to alignment). */
+        int pitch{};
     };
 
     /** An interface of a camera class. */
