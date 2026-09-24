@@ -1,17 +1,30 @@
 #include "Camera.h"
 #include "TraceLog/Log.hpp"
 
-#include <opencv2/imgproc.hpp>
+#include <SDL3/SDL.h>
 
 using namespace Camera;
 using namespace std;
+
+namespace details
+{
+    struct SdlCameraIdDeleter
+    {
+        void operator() (SDL_CameraID* id) const noexcept
+        {
+            SDL_free (id);
+        }
+    };
+
+    using SDLCameraIdPtr = unique_ptr<SDL_CameraID, SdlCameraIdDeleter>;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Factory function.
 
 unique_ptr<ICamera> Camera::createCamera (int cameraIndex)
 {
-    unique_ptr<OpenCVCamera> cam = make_unique<OpenCVCamera>();
+    unique_ptr<SDLCamera> cam = make_unique<SDLCamera>();
 
     if (!cam->open (cameraIndex))
     {
@@ -21,118 +34,113 @@ unique_ptr<ICamera> Camera::createCamera (int cameraIndex)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// OpenCVCamera
+// SDLCamera
 
-OpenCVCamera::OpenCVCamera ()
-    : m_isNewFrame {}
+SDLCamera::SDLCamera ()
+    : m_camera {nullptr, SDL_CloseCamera}
+    , m_permissionGranted {}
+    , m_rgbSurface {nullptr, SDL_DestroySurface}
 {
-    m_capture.set (cv::CAP_PROP_OPEN_TIMEOUT_MSEC, 5000);
-    m_capture.set (cv::CAP_PROP_READ_TIMEOUT_MSEC, 2000);
 }
 
-OpenCVCamera::~OpenCVCamera () = default;
-
-bool OpenCVCamera::open (int cameraIndex)
+SDLCamera::~SDLCamera ()
 {
-    bool result = {};
+    close ();
+}
 
+bool SDLCamera::open (int cameraIndex)
+{
+    bool result = false;
     close ();
 
-    if (m_capture.open (cameraIndex))
+    int count = 0;
+    auto devices = details::SDLCameraIdPtr (SDL_GetCameras (&count));
+
+    if (devices && (count > 0) && (cameraIndex >= 0) && (cameraIndex < count))
     {
-        APP_INFO ("Camera opened: index {}", cameraIndex);
+        SDL_CameraID deviceId = devices.get () [cameraIndex];
+        SDL_Camera* cam = SDL_OpenCamera (deviceId, nullptr);
 
-        m_thread = jthread ( [this] (stop_token token) {
-            captureLoop (token);
-        });
-
-        result = true;
+        if (cam)
+        {
+            m_camera.reset (cam);
+            APP_INFO ("Camera opened: index {}", cameraIndex);
+            result = true;
+        }
+        else
+        {
+            APP_ERROR ("[Camera] Failed to open camera: {}", SDL_GetError ());
+        }
     }
     else
     {
-        APP_ERROR ("[Camera] Can not open camera with index {}", cameraIndex);
+        if (devices)
+        {
+            devices.reset ();
+        }
+        APP_ERROR ("[Camera] Invalid camera index {} (available: {})", cameraIndex, count);
+    }
+    m_permissionGranted = false;
+    return result;
+}
+
+void SDLCamera::close ()
+{
+    m_camera.reset ();
+    m_permissionGranted = false;
+}
+
+bool SDLCamera::read (CameraFrame& frame)
+{
+    bool result = false;
+
+    if (m_camera)
+    {
+        SDL_CameraPermissionState permState = SDL_GetCameraPermissionState (m_camera.get ());
+
+        if (permState == SDL_CAMERA_PERMISSION_STATE_DENIED)
+        {
+            APP_ERROR ("[Camera] Camera permission denied");
+            close ();
+        }
+        else if (permState != SDL_CAMERA_PERMISSION_STATE_PENDING)
+        {
+            m_permissionGranted = true;
+
+            Uint64 timestampNS = 0;
+            SDL_Surface* sdlFrame = SDL_AcquireCameraFrame (m_camera.get (), &timestampNS);
+
+            if (sdlFrame)
+            {
+                {
+                    lock_guard lock{m_mutex};
+
+                    SDL_Surface* rgbSurface = SDL_ConvertSurface (sdlFrame, SDL_PIXELFORMAT_RGB24);
+
+                    if (rgbSurface)
+                    {
+                        m_rgbSurface.reset (rgbSurface);
+
+                        frame.data = static_cast<const uint8_t*> (m_rgbSurface->pixels);
+                        frame.width = m_rgbSurface->w;
+                        frame.height = m_rgbSurface->h;
+                        frame.channels = 3;
+                        frame.pitch = m_rgbSurface->pitch;
+                        result = true;
+                    }
+                    else
+                    {
+                        APP_WARN ("[Camera] Failed to convert surface to RGB24: {}", SDL_GetError ());
+                    }
+                }
+                SDL_ReleaseCameraFrame (m_camera.get (), sdlFrame);
+            }
+        }
     }
     return result;
 }
 
-void OpenCVCamera::close ()
+bool SDLCamera::isOpen () const
 {
-    if (m_thread.joinable ())
-    {
-        m_thread.request_stop ();
-        m_thread.join ();
-    }
-
-    if (m_capture.isOpened ())
-    {
-        m_capture.release ();
-    }
-    {
-        lock_guard lock{m_mutex};
-        m_backBuffer = {};
-        m_frontBuffer = {};
-        m_isNewFrame = false;
-    }
-}
-
-bool OpenCVCamera::read (CameraFrame& frame)
-{
-    {
-        lock_guard lock{m_mutex};
-
-        if (!m_isNewFrame)
-        {
-            return false;
-        }
-        swap (m_frontBuffer, m_backBuffer);
-        m_isNewFrame = false;
-    }
-
-    cv::cvtColor (m_frontBuffer, m_rgb, cv::COLOR_BGR2RGB);
-
-    frame.data = m_rgb.data;
-    frame.width = m_rgb.cols;
-    frame.height = m_rgb.rows;
-    frame.channels = m_rgb.channels ();
-
-    return true;
-}
-
-bool OpenCVCamera::isOpen () const
-{
-    return m_capture.isOpened ();
-}
-
-void OpenCVCamera::captureLoop (stop_token stopToken)
-{
-    try
-    {
-        cv::Mat frame;
-
-        while (!stopToken.stop_requested ())
-        {
-            if (!m_capture.read (frame) || frame.empty ())
-            {
-                this_thread::sleep_for (chrono::milliseconds (10));
-                continue;
-            }
-            {
-                lock_guard lock{m_mutex};
-                swap (m_backBuffer, frame);
-                m_isNewFrame = true;
-            }
-        }
-    }
-    catch (const cv::Exception& e)
-    {
-        APP_ERROR ("Capture thread cv::Exception: {}", e.what ());
-    }
-    catch (const std::exception& e)
-    {
-        APP_ERROR ("Capture thread std::exception: {}", e.what ());
-    }
-    catch (...)
-    {
-        APP_ERROR ("Capture thread unknown exception");
-    }
+    return m_camera != nullptr && m_permissionGranted;
 }

@@ -37,7 +37,7 @@ void SdlCameraTexture::update (const CameraFrame& frame)
     {
         return;
     }
-    const int pitch = frame.width * frame.channels;
+    const int pitch = frame.pitch > 0 ? frame.pitch : frame.width * frame.channels;
 
     if (!SDL_UpdateTexture (m_texture.get (), nullptr, frame.data, pitch))
     {
