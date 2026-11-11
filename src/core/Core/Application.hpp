@@ -1,4 +1,5 @@
 #pragma once
+#include "Camera/ICamera.h"
 #include "Events/Bus.h"
 #include "Sdl/ImGuiPass.h"
 #include "Sdl/IPathService.h"
@@ -46,6 +47,8 @@ namespace App
         void stop ();
         /** Initializes the application, setting up necessary resources and state. */
         void init ();
+        /** Refreshes the list of available cameras from the current device list. */
+        void refreshCameraList ();
 
         /** Exit status of the application. */
         ExitStatus m_exitStatus;
@@ -70,5 +73,9 @@ namespace App
         SdlEventTranslator m_eventTranslator;
         /** The user interface for the application. */
         std::unique_ptr<Ui::IAppUi> m_ui;
+        /** Currently open camera; nullptr when no camera is open or open attempts have failed. */
+        std::unique_ptr<Camera::ICamera> m_camera;
+        /** Positional index of the currently open camera device. */
+        int m_cameraIndex{-1};
     };
 }

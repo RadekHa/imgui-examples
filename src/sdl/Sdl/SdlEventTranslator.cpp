@@ -42,6 +42,7 @@ void SdlEventTranslator::translate (const SDL_Event& e, EventBus& bus)
         break;
 
     case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED:
+    {
         SDL_Window* window = SDL_GetWindowFromID (e.window.windowID);
 
         if (window)
@@ -50,5 +51,6 @@ void SdlEventTranslator::translate (const SDL_Event& e, EventBus& bus)
             bus.publish (EventScaleChanged{.scale = scale});
         }
         break;
+    }
     }
 }

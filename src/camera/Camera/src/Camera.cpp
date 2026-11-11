@@ -33,6 +33,29 @@ unique_ptr<ICamera> Camera::createCamera (int cameraIndex)
     return cam;
 }
 
+vector<CameraInfo> Camera::enumerateCameras ()
+{
+    vector<CameraInfo> result;
+
+    int count = 0;
+    auto devices = details::SDLCameraIdPtr (SDL_GetCameras (&count));
+
+    if (devices && count > 0)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            SDL_CameraID deviceId = devices.get()[i];
+            const char* name = SDL_GetCameraName(deviceId);
+            CameraInfo info;
+            info.index = i;
+            info.name = name ? name : "Unknown Camera";
+            result.push_back(move(info));
+        }
+    }
+
+    return result;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // SDLCamera
 

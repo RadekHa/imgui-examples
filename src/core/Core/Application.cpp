@@ -1,6 +1,5 @@
 #include "Application.hpp"
 #include "Camera/ICamera.h"
-#include "Sdl/DpiHandler.h"
 #include "Sdl/FrameContext.h"
 #include "Sdl/SdlCameraTexture.h"
 #include "TraceLog/Log.hpp"
@@ -23,6 +22,7 @@ Application::Application (const string& title, const IPathService* paths)
 {
     ZoneScoped;
     init ();
+    refreshCameraList ();
 }
 
 Application::~Application ()
@@ -42,19 +42,31 @@ ExitStatus Application::run ()
 
     vector<SDL_Event> events;
 
-    unique_ptr<ICamera> camera = createCamera (0);
-
     CameraFrame frame;
     SdlCameraTexture camTexture{m_renderer.native ()};
-
 
     while (m_isRunning)
     {
         ZoneScopedN ("MainLoop");
 
-        if (camera && camera->read (frame))
+        if (!m_camera || (m_model.selectedCameraIndex != m_cameraIndex))
+        {
+            m_camera = createCamera (m_model.selectedCameraIndex);
+            m_cameraIndex = m_model.selectedCameraIndex;
+
+            if (m_camera)
+            {
+                APP_INFO ("Camera opened: index {}", m_cameraIndex);
+            }
+        }
+
+        if (m_camera && m_camera->read (frame))
         {
             camTexture.update (frame);
+        }
+        else if (!m_camera)
+        {
+            m_model.camera.isValid = false;
         }
         FrameContext frameContext;
 
@@ -84,6 +96,19 @@ ExitStatus Application::run ()
         m_bus.dispatch ();
     }
     return ExitStatus::SUCCESS;
+}
+
+void Application::refreshCameraList ()
+{
+    m_model.cameras = Camera::enumerateCameras ();
+
+    if (!m_model.cameras.empty () && (m_model.selectedCameraIndex >= static_cast<int> (m_model.cameras.size ())))
+    {
+        m_model.selectedCameraIndex = 0;
+    }
+    APP_INFO ("Camera list refreshed: {} camera(s), selected index {}",
+              m_model.cameras.size (),
+              m_model.selectedCameraIndex);
 }
 
 void Application::stop ()

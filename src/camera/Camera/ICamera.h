@@ -1,7 +1,9 @@
 #pragma once
+#include "Types/CameraInfo.h"
+
 #include <cstdint>
 #include <memory>
-#include <string>
+#include <vector>
 
 namespace Camera
 {
@@ -32,4 +34,7 @@ namespace Camera
 
     /** Factory function to create an instance of ICamera. */
     std::unique_ptr<ICamera> createCamera (int cameraIndex);
+
+    /** Enumerate available cameras. Returns a list of camera info (index, name). */
+    std::vector<CameraInfo> enumerateCameras ();
 }

@@ -8,9 +8,7 @@
 
 namespace Camera
 {
-    /**
-      * SDL3-based camera implementation using the native SDL_Camera API.
-      */
+    /** SDL3-based camera implementation using the native SDL_Camera API. */
     class SDLCamera : public ICamera
     {
     public:
@@ -34,6 +32,7 @@ namespace Camera
         bool isOpen () const override;
 
     private:
+        /** SDL camera handle managed via RAII. */
         using SDLCameraPtr = std::unique_ptr<SDL_Camera, void (*)(SDL_Camera*)>;
         /** Opaque SDL camera handle managed via RAII. */
         SDLCameraPtr m_camera{nullptr, SDL_CloseCamera};
