@@ -2,6 +2,8 @@
 #include "SdlWindow.h"
 #include "TraceLog/Log.hpp"
 
+#include <SDL3/SDL.h>
+
 using namespace App;
 using namespace Sdl;
 using namespace std;

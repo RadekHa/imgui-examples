@@ -1,11 +1,16 @@
 #include "Application.hpp"
 #include "Camera/ICamera.h"
-#include "Sdl/DpiHandler.h"
 #include "Sdl/FrameContext.h"
+#include "Sdl/ImGuiPass.h"
 #include "Sdl/SdlCameraTexture.h"
+#include "Sdl/SdlEventTranslator.h"
+#include "Sdl/SdlRenderer.h"
+#include "Sdl/SdlWindow.h"
 #include "TraceLog/Log.hpp"
 #include "TraceLog/Tracy.hpp"
 #include "Ui/IAppUi.h"
+
+#include <SDL3/SDL_events.h>
 
 using namespace App;
 using namespace Camera;
@@ -16,13 +21,18 @@ Application::Application (const string& title, const IPathService* paths)
     : m_exitStatus {ExitStatus::SUCCESS}
     , m_isRunning {true}
     , m_isMinimized {}
-    , m_window (title)
-    , m_renderer (m_window.native (), paths)
-    , m_imgui (m_window.native (), m_renderer.native (), paths)
     , m_ui {Ui::createAppUi ()}
+    , m_cameraIndex {-1}
 {
     ZoneScoped;
+
+    m_window = make_unique<SdlWindow> (title);
+    m_renderer = make_unique<SdlRenderer> (m_window->native (), paths);
+    m_imgui = make_unique<ImGuiPass> (m_window->native (), m_renderer->native (), paths);
+    m_eventTranslator = make_unique<SdlEventTranslator> ();
+
     init ();
+    refreshCameraList ();
 }
 
 Application::~Application ()
@@ -42,31 +52,43 @@ ExitStatus Application::run ()
 
     vector<SDL_Event> events;
 
-    unique_ptr<ICamera> camera = createCamera (0);
-
     CameraFrame frame;
-    SdlCameraTexture camTexture{m_renderer.native ()};
-
+    SdlCameraTexture camTexture{m_renderer->native ()};
+    bool hasPreview{false};
 
     while (m_isRunning)
     {
         ZoneScopedN ("MainLoop");
 
-        if (camera && camera->read (frame))
+        if (!m_camera || (m_model.selectedCameraIndex != m_cameraIndex))
+        {
+            m_camera = createCamera (m_model.selectedCameraIndex);
+            m_cameraIndex = m_model.selectedCameraIndex;
+            hasPreview = false;
+            m_model.camera.isValid = false;
+
+            if (m_camera)
+            {
+                APP_INFO ("Camera opened: index {}", m_cameraIndex);
+            }
+        }
+
+        if (m_camera && m_camera->read (frame))
         {
             camTexture.update (frame);
+            hasPreview = true;
         }
         FrameContext frameContext;
 
-        m_window.pollEvents (events);
-        m_eventTranslator.process (events, m_bus);
+        m_window->pollEvents (events);
+        m_eventTranslator->process (events.data (), static_cast<int> (events.size ()), m_bus);
 
-        m_imgui.beginFrame (events);
-        m_imgui.fillFrameContext (frameContext);
+        m_imgui->beginFrame (events);
+        m_imgui->fillFrameContext (frameContext);
 
-        m_renderer.beginFrame (frameContext);
+        m_renderer->beginFrame (frameContext);
 
-        if (!m_isMinimized)
+        if (!m_isMinimized && hasPreview)
         {
             m_model.camera = Ui::ImageInfo {
                 .textureId = camTexture.getImguiTextureId (),
@@ -76,14 +98,27 @@ ExitStatus Application::run ()
             };
 
             m_ui->update (m_model);
-            m_renderer.update (m_model);
+            m_renderer->update (m_model);
         }
-        m_imgui.endFrame ();
-        m_renderer.endFrame ();
+        m_imgui->endFrame ();
+        m_renderer->endFrame ();
         // Dispatch events after processing the frame.
         m_bus.dispatch ();
     }
     return ExitStatus::SUCCESS;
+}
+
+void Application::refreshCameraList ()
+{
+    m_model.cameras = Camera::enumerateCameras ();
+
+    if (!m_model.cameras.empty () && (m_model.selectedCameraIndex >= static_cast<int> (m_model.cameras.size ())))
+    {
+        m_model.selectedCameraIndex = 0;
+    }
+    APP_INFO ("Camera list refreshed: {} camera(s), selected index {}",
+              m_model.cameras.size (),
+              m_model.selectedCameraIndex);
 }
 
 void Application::stop ()
@@ -105,7 +140,7 @@ void Application::init ()
 
     m_subscriptions.emplace_back (m_bus.subscribe<EventScaleChanged> ( [this] (const auto& e) {
         APP_INFO ("Scale changed: {}", e.scale);
-        m_window.resize (e.scale);
-        m_imgui.rebuildFonts (e.scale);
+        m_window->resize (e.scale);
+        m_imgui->rebuildFonts (e.scale);
     }));
 }

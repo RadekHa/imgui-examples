@@ -1,12 +1,13 @@
 #pragma once
 #include "IPathService.h"
 
+#include <memory>
 #include <vector>
+
+#include <SDL3/SDL_events.h>
 
 /** Forward class declaration of SDL window. */
 typedef struct SDL_Window SDL_Window;
-/** Forward class declaration of SDL event. */
-typedef union SDL_Event SDL_Event;
 /** Forward class declaration of SDL renderer. */
 struct SDL_Renderer;
 /** Forward class declaration of ImGuiIO structure. */

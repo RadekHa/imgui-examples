@@ -12,5 +12,6 @@ target_include_directories(${NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Camera/sr
 target_compile_features(${NAME} PRIVATE cxx_std_20)
 
 target_link_libraries(${NAME}
+  PUBLIC Types
   PRIVATE TraceLog project_warnings SDL3::SDL3
 )

@@ -1,10 +1,7 @@
 #pragma once
+#include "Camera/ICamera.h"
 #include "Events/Bus.h"
-#include "Sdl/ImGuiPass.h"
 #include "Sdl/IPathService.h"
-#include "Sdl/SdlEventTranslator.h"
-#include "Sdl/SdlRenderer.h"
-#include "Sdl/SdlWindow.h"
 #include "Types/DataModel.h"
 #include "Ui/IAppUi.h"
 
@@ -13,6 +10,12 @@
 
 namespace App
 {
+    /** Forward declarations of Sdl module classes. */
+    class SdlWindow;
+    class SdlRenderer;
+    class ImGuiPass;
+    class SdlEventTranslator;
+
     /** Enum representing the exit status of the application. */
     enum class ExitStatus : int
     {
@@ -46,6 +49,8 @@ namespace App
         void stop ();
         /** Initializes the application, setting up necessary resources and state. */
         void init ();
+        /** Refreshes the list of available cameras from the current device list. */
+        void refreshCameraList ();
 
         /** Exit status of the application. */
         ExitStatus m_exitStatus;
@@ -59,16 +64,20 @@ namespace App
         /** Vector of subscriptions to application events, allowing for automatic unsubscription when the Application object is destroyed. */
         std::vector<EventBus::Subscription> m_subscriptions;
         /** The main application window. */
-        SdlWindow m_window;
+        std::unique_ptr<SdlWindow> m_window;
         /** The renderer for drawing to the window. */
-        SdlRenderer m_renderer;
+        std::unique_ptr<SdlRenderer> m_renderer;
         /** The ImGui pass for rendering the UI. */
-        ImGuiPass m_imgui;
+        std::unique_ptr<ImGuiPass> m_imgui;
         /** The data model representing the state of the application. */
         DataModel m_model;
         /** The SDL event translator for processing SDL events and translating them into application events. */
-        SdlEventTranslator m_eventTranslator;
+        std::unique_ptr<SdlEventTranslator> m_eventTranslator;
         /** The user interface for the application. */
         std::unique_ptr<Ui::IAppUi> m_ui;
+        /** Currently open camera; nullptr when no camera is open or open attempts have failed. */
+        std::unique_ptr<Camera::ICamera> m_camera;
+        /** Positional index of the currently open camera device. */
+        int m_cameraIndex;
     };
 }

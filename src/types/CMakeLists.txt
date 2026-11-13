@@ -2,6 +2,7 @@ set(NAME "Types")
 
 add_library(${NAME} INTERFACE
   "Types/ImageInfo.h"
+  "Types/CameraInfo.h"
   "Types/DataModel.h"
 )
 

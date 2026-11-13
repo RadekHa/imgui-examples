@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include <SDL3/SDL_events.h>
+
 /** Forward class declaration of SDL window. */
 typedef struct SDL_Window SDL_Window;
 

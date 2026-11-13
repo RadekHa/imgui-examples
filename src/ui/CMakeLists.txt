@@ -4,16 +4,8 @@ include(${PROJECT_SOURCE_DIR}/cmake/StaticAnalyzers.cmake)
 
 add_library(${NAME}
   "Ui/IAppUi.h"
-  "Ui/src/IUiState.h"
   "Ui/src/AppUi.h"
   "Ui/src/AppUi.cpp"
-  "Ui/src/StateNull.h"
-  "Ui/src/StateLogin.h"
-  "Ui/src/StateNull.cpp"
-  "Ui/src/StateStart.h"
-  "Ui/src/StateStart.cpp"
-  "Ui/src/StateLogin.h"
-  "Ui/src/StateLogin.cpp"
 )
 
 target_include_directories(${NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

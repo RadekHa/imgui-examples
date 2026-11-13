@@ -1,15 +1,22 @@
 #pragma once
+#include "Types/CameraInfo.h"
+
 #include <cstdint>
 #include <memory>
-#include <string>
+#include <vector>
 
 namespace Camera
 {
+    /** Struct representing a camera frame. */
     struct CameraFrame
     {
+        /** Pointer to the frame data. */
         const uint8_t* data{nullptr};
+        /** Frame width in pixels. */
         int width{};
+        /** Frame height in pixels. */
         int height{};
+        /** Number of color channels in the frame. */
         int channels{};
         /** Byte stride (may be > width * channels due to alignment). */
         int pitch{};
@@ -32,4 +39,7 @@ namespace Camera
 
     /** Factory function to create an instance of ICamera. */
     std::unique_ptr<ICamera> createCamera (int cameraIndex);
+
+    /** Enumerate available cameras. Returns a list of camera info (index, name). */
+    std::vector<CameraInfo> enumerateCameras ();
 }

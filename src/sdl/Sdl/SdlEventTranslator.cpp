@@ -5,11 +5,11 @@
 using namespace App;
 using namespace std;
 
-void SdlEventTranslator::process (const vector<SDL_Event>& events, EventBus& bus)
+void SdlEventTranslator::process (const SDL_Event* events, int count, EventBus& bus)
 {
-    for (const auto& e : events)
+    for (int i = 0; i < count; ++i)
     {
-        translate (e, bus);
+        translate (events[i], bus);
     }
 }
 
@@ -42,6 +42,7 @@ void SdlEventTranslator::translate (const SDL_Event& e, EventBus& bus)
         break;
 
     case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED:
+    {
         SDL_Window* window = SDL_GetWindowFromID (e.window.windowID);
 
         if (window)
@@ -50,5 +51,6 @@ void SdlEventTranslator::translate (const SDL_Event& e, EventBus& bus)
             bus.publish (EventScaleChanged{.scale = scale});
         }
         break;
+    }
     }
 }

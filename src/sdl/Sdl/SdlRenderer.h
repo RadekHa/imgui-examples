@@ -3,6 +3,9 @@
 #include "Sdl/SdlWrapper.h"
 #include "Types/DataModel.h"
 
+/** Forward class declaration of SDL window. */
+typedef struct SDL_Window SDL_Window;
+
 namespace App
 {
     /** Forward declaration of FrameContext struct. */
