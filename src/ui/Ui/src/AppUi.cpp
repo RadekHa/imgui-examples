@@ -1,5 +1,4 @@
 #include "AppUi.h"
-#include "StateStart.h"
 #include "TraceLog/Tracy.hpp"
 #include "Types/DataModel.h"
 
@@ -20,10 +19,7 @@ IAppUi* Ui::createAppUi ()
 ///////////////////////////////////////////////////////////////////////////////
 // AppUi
 
-AppUi::AppUi ()
-    : m_state {new StateStart}
-{
-}
+AppUi::AppUi () = default;
 
 AppUi::~AppUi () = default;
 
@@ -111,10 +107,4 @@ void AppUi::update (App::DataModel& model)
     }
 
     ImGui::End ();
-    // IUiState* state = m_state->update (model);
-
-    // if (state != nullptr)
-    // {
-    //    m_state.reset (state);
-    // }
 }

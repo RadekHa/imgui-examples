@@ -3,6 +3,10 @@
 #include "Types/ImageInfo.h"
 #include <vector>
 
+// Convention: the Types module holds shared value types with no dependencies.
+// Namespaces mirror the logical owner of the type (App, Camera, Ui), not a
+// dependency on those modules.
+
 namespace App
 {
     /** Struct representing the data model for the application. */

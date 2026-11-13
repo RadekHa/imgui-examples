@@ -6,7 +6,7 @@ using namespace App;
 using namespace std;
 
 
-TEST_CASE ("Core::EventBus")
+TEST_CASE ("Events::EventBus")
 {
     using Events = variant<int, string>;
     using EventBus = EventBusImpl<Events>;
