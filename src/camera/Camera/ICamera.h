@@ -7,11 +7,16 @@
 
 namespace Camera
 {
+    /** Struct representing a camera frame. */
     struct CameraFrame
     {
+        /** Pointer to the frame data. */
         const uint8_t* data{nullptr};
+        /** Frame width in pixels. */
         int width{};
+        /** Frame height in pixels. */
         int height{};
+        /** Number of color channels in the frame. */
         int channels{};
         /** Byte stride (may be > width * channels due to alignment). */
         int pitch{};
