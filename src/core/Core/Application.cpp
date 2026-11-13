@@ -19,6 +19,7 @@ Application::Application (const string& title, const IPathService* paths)
     , m_renderer (m_window.native (), paths)
     , m_imgui (m_window.native (), m_renderer.native (), paths)
     , m_ui {Ui::createAppUi ()}
+    , m_cameraIndex {-1}
 {
     ZoneScoped;
     init ();
@@ -44,6 +45,7 @@ ExitStatus Application::run ()
 
     CameraFrame frame;
     SdlCameraTexture camTexture{m_renderer.native ()};
+    bool hasPreview{false};
 
     while (m_isRunning)
     {
@@ -53,6 +55,8 @@ ExitStatus Application::run ()
         {
             m_camera = createCamera (m_model.selectedCameraIndex);
             m_cameraIndex = m_model.selectedCameraIndex;
+            hasPreview = false;
+            m_model.camera.isValid = false;
 
             if (m_camera)
             {
@@ -63,10 +67,7 @@ ExitStatus Application::run ()
         if (m_camera && m_camera->read (frame))
         {
             camTexture.update (frame);
-        }
-        else if (!m_camera)
-        {
-            m_model.camera.isValid = false;
+            hasPreview = true;
         }
         FrameContext frameContext;
 
@@ -78,7 +79,7 @@ ExitStatus Application::run ()
 
         m_renderer.beginFrame (frameContext);
 
-        if (!m_isMinimized)
+        if (!m_isMinimized && hasPreview)
         {
             m_model.camera = Ui::ImageInfo {
                 .textureId = camTexture.getImguiTextureId (),

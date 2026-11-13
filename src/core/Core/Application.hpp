@@ -76,6 +76,6 @@ namespace App
         /** Currently open camera; nullptr when no camera is open or open attempts have failed. */
         std::unique_ptr<Camera::ICamera> m_camera;
         /** Positional index of the currently open camera device. */
-        int m_cameraIndex{-1};
+        int m_cameraIndex;
     };
 }

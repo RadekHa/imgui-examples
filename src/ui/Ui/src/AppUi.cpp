@@ -51,44 +51,44 @@ void AppUi::update (App::DataModel& model)
         ImGui::ShowDemoWindow (&model.showDemo);
     }
 
-    if (model.camera.isValid && (model.camera.width != 0) && (model.camera.height != 0))
-    {
-        ImGui::Begin ("Camera");
+    ImGui::Begin ("Camera");
 
-        if (!model.cameras.empty ())
+    if (!model.cameras.empty ())
+    {
+        const char* currentName = "Unknown";
+        for (const auto& cam : model.cameras)
         {
-            const char* currentName = "Unknown";
+            if (cam.index == model.selectedCameraIndex)
+            {
+                currentName = cam.name.c_str ();
+                break;
+            }
+        }
+
+        if (ImGui::BeginCombo ("Kamera", currentName))
+        {
             for (const auto& cam : model.cameras)
             {
-                if (cam.index == model.selectedCameraIndex)
+                bool isSelected = (cam.index == model.selectedCameraIndex);
+                if (ImGui::Selectable (cam.name.c_str (), isSelected))
                 {
-                    currentName = cam.name.c_str ();
-                    break;
+                    model.selectedCameraIndex = cam.index;
+                }
+                if (isSelected)
+                {
+                    ImGui::SetItemDefaultFocus ();
                 }
             }
-
-            if (ImGui::BeginCombo ("Kamera", currentName))
-            {
-                for (const auto& cam : model.cameras)
-                {
-                    bool isSelected = (cam.index == model.selectedCameraIndex);
-                    if (ImGui::Selectable (cam.name.c_str (), isSelected))
-                    {
-                        model.selectedCameraIndex = cam.index;
-                    }
-                    if (isSelected)
-                    {
-                        ImGui::SetItemDefaultFocus ();
-                    }
-                }
-                ImGui::EndCombo ();
-            }
+            ImGui::EndCombo ();
         }
-        else
-        {
-            ImGui::TextDisabled ("No cameras found");
-        }
+    }
+    else
+    {
+        ImGui::TextDisabled ("No cameras found");
+    }
 
+    if (model.camera.isValid && (model.camera.width != 0) && (model.camera.height != 0))
+    {
         ImVec2 available = ImGui::GetContentRegionAvail ();
 
         float texW = float (model.camera.width);
@@ -108,8 +108,9 @@ void AppUi::update (App::DataModel& model)
                       size,
                       ImVec2 (1, 0),
                       ImVec2 (0, 1));
-        ImGui::End ();
     }
+
+    ImGui::End ();
     // IUiState* state = m_state->update (model);
 
     // if (state != nullptr)
