@@ -3,6 +3,8 @@
 #include "SdlUtils.h"
 #include "TraceLog/Log.hpp"
 
+#include <SDL3/SDL.h>
+
 #include <stdexcept>
 
 using namespace App;

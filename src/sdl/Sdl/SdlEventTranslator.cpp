@@ -5,11 +5,11 @@
 using namespace App;
 using namespace std;
 
-void SdlEventTranslator::process (const vector<SDL_Event>& events, EventBus& bus)
+void SdlEventTranslator::process (const SDL_Event* events, int count, EventBus& bus)
 {
-    for (const auto& e : events)
+    for (int i = 0; i < count; ++i)
     {
-        translate (e, bus);
+        translate (events[i], bus);
     }
 }
 

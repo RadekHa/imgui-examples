@@ -3,9 +3,9 @@
 
 struct SDL_Renderer;
 
+/** Forward declaration of camera frame. */
 namespace Camera
 {
-    /** Forward declaration of camera frame. */
     struct CameraFrame;
 }
 

@@ -14,7 +14,7 @@ add_library(${NAME} STATIC
   "Sdl/SdlRenderer.h"             "Sdl/SdlRenderer.cpp"
   "Sdl/SdlUtils.h"                "Sdl/SdlUtils.cpp"
   "Sdl/SdlWindow.h"               "Sdl/SdlWindow.cpp"
-  "Sdl/SdlWrapper.h"
+  "Sdl/SdlWrapper.h"              "Sdl/SdlWrapper.cpp"
 )
 
 target_include_directories(${NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
